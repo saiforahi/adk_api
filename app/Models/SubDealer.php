@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SubDealers extends Model
+class SubDealer extends Model
 {
-    use HasFactory;
+    use HasApiTokens, HasFactory, Notifiable,InteractsWithMedia;
 }

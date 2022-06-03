@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PreDealer extends Model
+class Brand extends Model
 {
-    use HasApiTokens, HasFactory, Notifiable,InteractsWithMedia;
+    use HasFactory;
 }

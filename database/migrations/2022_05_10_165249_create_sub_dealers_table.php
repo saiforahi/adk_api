@@ -15,9 +15,11 @@ return new class extends Migration
     {
         Schema::create('sub_dealers', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id')->unique();
             $table->unsignedBigInteger('sub_dealer_type_id')->nullable();
             $table->timestamps();
             $table->foreign('sub_dealer_type_id')->references('id')->on('sub_dealer_types');
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

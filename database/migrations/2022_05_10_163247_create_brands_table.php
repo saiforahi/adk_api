@@ -13,13 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('pre_dealers', function (Blueprint $table) {
+        Schema::create('brands', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->unique();
-            $table->unsignedBigInteger('pre_dealer_type_id')->nullable();
             $table->timestamps();
-            $table->foreign('pre_dealer_type_id')->references('id')->on('pre_dealer_types');
-            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 
@@ -30,6 +26,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pre_dealers');
+        Schema::dropIfExists('brands');
     }
 };
