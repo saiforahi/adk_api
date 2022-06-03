@@ -8,7 +8,7 @@ use App\Models\Brand;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Support\Str;
 
 class BrandController extends Controller
 {
@@ -30,6 +30,7 @@ class BrandController extends Controller
     {
         try {
             $data = $request->validated();
+            $data['slug'] = Str::slug($data['name']);
             if ($request->file('logo')) {
                 $filename = $request->file('logo')->store('brand', 'public');
                 Storage::disk('local')->path($filename);
@@ -48,11 +49,7 @@ class BrandController extends Controller
      */
     public function show(Brand $brand): JsonResponse
     {
-        try {
-            return $this->success($brand);
-        } catch (NotFoundHttpException $exception) {
-            return $this->failed(null, $exception->getMessage(), 404);
-        }
+        return $this->success($brand);
     }
 
     public function update(Brand $brand, Request $request)

@@ -27,8 +27,7 @@ class BrandRequest extends FormRequest
             'name' => 'required|unique:brands',
             'meta_title' => 'nullable',
             'meta_description' => 'nullable',
-            'logo' => 'nullable',
-            'slug' => 'alpha_dash|unique:brands',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
             'top' => 'nullable',
             'serial' => 'nullable'
         ];
