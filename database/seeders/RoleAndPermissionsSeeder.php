@@ -24,7 +24,8 @@ class RoleAndPermissionsSeeder extends Seeder
 
         // create demo users
         $user = \App\Models\Admin::factory()->create([
-            'name' => 'Mr Admin',
+            'first_name' => 'Mr Super',
+            'last_name'=>'Admin',
             'email' => 'admin@mail.com',
             'phone'=> '01XXXXXXXXX',
             'password' => Hash::make('12345678'),
@@ -33,7 +34,8 @@ class RoleAndPermissionsSeeder extends Seeder
         // $user->assignRole($role1);
 
         $user = \App\Models\Dealer::factory()->create([
-            'name' => 'Mr Dealer',
+            'first_name' => 'Mr',
+            'last_name'=>'Dealer',
             'email' => 'dealer@mail.com',
             'phone'=> '01YXXXXXXXX',
             'password' => Hash::make('12345678'),

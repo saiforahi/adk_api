@@ -16,7 +16,8 @@ return new class extends Migration
         Schema::create('sub_dealers', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('sub_dealer_type_id')->nullable();
-            $table->string('name');
+            $table->string('first_name');
+            $table->string('last_name')->nullable();
             $table->string('email')->unique();
             $table->string('phone')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
