@@ -11,12 +11,20 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PreDealer extends Authenticatable implements HasMedia,MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable,InteractsWithMedia;
+    use HasApiTokens, HasFactory, Notifiable,InteractsWithMedia,SoftDeletes;
     protected $guard_name = 'pre_dealer';
     protected $guarded=[];
+    protected $hidden=['password','remember_token'];
+    protected $casts = [
+        'email_verified_at' => 'datetime:Y-m-d h:i:s A',
+        'created_at'=>'datetime:Y-m-d h:i:s A',
+        'updated_at'=>'datetime:Y-m-d h:i:s A',
+        'deleted_at'=>'datetime:Y-m-d h:i:s A'
+    ];
     // returning guard name
     public function guard__name(){
         return $this->guard_name;

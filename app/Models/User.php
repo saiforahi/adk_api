@@ -11,10 +11,11 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements HasMedia,MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable,InteractsWithMedia,HasRoles;
+    use HasApiTokens, HasFactory, Notifiable,InteractsWithMedia,HasRoles,SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -39,7 +40,10 @@ class User extends Authenticatable implements HasMedia,MustVerifyEmail
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'email_verified_at' => 'datetime:Y-m-d h:i:s A',
+        'created_at'=>'datetime:Y-m-d h:i:s A',
+        'updated_at'=>'datetime:Y-m-d h:i:s A',
+        'deleted_at'=>'datetime:Y-m-d h:i:s A'
     ];
     protected $guard_name = 'staff';
     // returning guard name

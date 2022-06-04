@@ -24,7 +24,7 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
             $table->foreign('pre_dealer_type_id')->references('id')->on('pre_dealer_types');
-            
+            $table->softDeletes($column = 'deleted_at', $precision = 0);
         });
     }
 

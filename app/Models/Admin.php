@@ -12,12 +12,20 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Admin extends Authenticatable implements HasMedia,MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable,InteractsWithMedia,HasRoles;
+    use HasApiTokens, HasFactory, Notifiable,InteractsWithMedia,HasRoles,SoftDeletes;
     protected $guard_name = 'admin';
     protected $guarded=[];
+    protected $hidden=['password','remember_token'];
+    protected $casts = [
+        'email_verified_at' => 'datetime:Y-m-d h:i:s A',
+        'created_at'=>'datetime:Y-m-d h:i:s A',
+        'updated_at'=>'datetime:Y-m-d h:i:s A',
+        'deleted_at'=>'datetime:Y-m-d h:i:s A'
+    ];
     // media functions
     public function guard__name(){
         return $this->guard_name;
