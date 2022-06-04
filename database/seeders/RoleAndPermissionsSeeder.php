@@ -18,32 +18,27 @@ class RoleAndPermissionsSeeder extends Seeder
     {
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // create permissions
-
-        // create roles and assign existing permissions
         $role1 = Role::create(['name' => 'admin']);
         $role2 = Role::create(['name' => 'user']);
-        // $role2->givePermissionTo('publish articles');
-        // $role2->givePermissionTo('unpublish articles');
-        //$role3 = Role::create(['name' => 'user']);
         // gets all permissions via Gate::before rule; see AuthServiceProvider
 
         // create demo users
-        $user = \App\Models\User::factory()->create([
+        $user = \App\Models\Admin::factory()->create([
             'name' => 'Mr Admin',
             'email' => 'admin@mail.com',
             'phone'=> '01XXXXXXXXX',
-            'password' => Hash::make('123456'),
+            'password' => Hash::make('12345678'),
             //'last_login_ip' => 'Male',
         ]);
-        $user->assignRole($role1);
+        // $user->assignRole($role1);
 
-        $user = \App\Models\User::factory()->create([
-            'name' => 'Mr User',
-            'email' => 'user@mail.com',
-            'password' => Hash::make('123456'),
+        $user = \App\Models\Dealer::factory()->create([
+            'name' => 'Mr Dealer',
+            'email' => 'dealer@mail.com',
+            'phone'=> '01YXXXXXXXX',
+            'password' => Hash::make('12345678'),
             //'gender' => 'Male',
         ]);
-        $user->assignRole($role2);
+        // $user->assignRole($role2);
     }
 }
