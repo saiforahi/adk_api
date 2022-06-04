@@ -7,23 +7,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements HasMedia
+class User extends Authenticatable implements HasMedia,MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable,InteractsWithMedia;
+    use HasApiTokens, HasFactory, Notifiable,InteractsWithMedia,HasRoles;
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $guarded = [];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -43,4 +41,26 @@ class User extends Authenticatable implements HasMedia
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    protected $guard_name = 'staff';
+    // returning guard name
+    public function guard__name(){
+        return $this->guard_name;
+    }
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $this->addMediaConversion('profile_pic')
+              ->width(247)
+              ->height(300)
+              ->sharpen(10)
+              ->queued();
+    }
+    public function registerMediaCollections(): void
+    {
+        // $this->addMediaCollection('thumb')->useDisk('public')->acceptsMimeTypes(['image/jpeg','image/jpg','image/png','image/webp'])->withResponsiveImages();
+        $this
+            ->addMediaCollection('profile_pic')
+            ->useDisk('public')
+            ->acceptsMimeTypes(['image/jpeg','image/jpg','image/png','image/webp'])
+            ->withResponsiveImages();
+    }
 }

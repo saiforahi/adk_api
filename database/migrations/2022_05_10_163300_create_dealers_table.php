@@ -15,14 +15,16 @@ return new class extends Migration
     {
         Schema::create('dealers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->unique();
             $table->unsignedBigInteger('dealer_type_id')->nullable();
-            $table->integer('capital')->nullable();
-            $table->integer('product_price')->nullable();
-            $table->float('commission')->nullable();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('phone')->unique()->nullable();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
             $table->timestamps();
             $table->foreign('dealer_type_id')->references('id')->on('dealer_types');
-            $table->foreign('user_id')->references('id')->on('users');
+            
         });
     }
 
