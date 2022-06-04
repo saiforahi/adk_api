@@ -29,13 +29,7 @@ class BrandController extends Controller
     public function store(BrandRequest $request): JsonResponse
     {
         try {
-            $data = $request->validated();
-            $data['slug'] = Str::slug($data['name']);
-            if ($request->file('logo')) {
-                $filename = $request->file('logo')->store('brand', 'public');
-                Storage::disk('local')->path($filename);
-                $data['logo'] = $filename;
-            }
+            $data = $this->brandData(null, $request);
             $brand = Brand::query()->create($data);
             return $this->success($brand);
         } catch (\Exception $exception) {
@@ -52,13 +46,52 @@ class BrandController extends Controller
         return $this->success($brand);
     }
 
-    public function update(Brand $brand, Request $request)
+    /**
+     * @param Brand $brand
+     * @param BrandRequest $request
+     * @return JsonResponse
+     */
+    public function update(Brand $brand, BrandRequest $request): JsonResponse
     {
-
+        try {
+            $data = $this->brandData($brand, $request);
+            $brand->update($data);
+            return $this->success($brand);
+        } catch (\Exception $exception) {
+            return $this->failed(null, $exception->getMessage(), 500);
+        }
     }
 
-    public function destroy(Brand $brand)
+    /**
+     * @param Brand $brand
+     * @return JsonResponse
+     */
+    public function destroy(Brand $brand): JsonResponse
     {
+        if ($image = Storage::disk('public')) {
+            $image->delete($brand->logo);
+        }
+        $brand->delete();
+        return $this->success($brand, 'Brand Deleted Successfully');
+    }
 
+    /**
+     * @param Brand|null $brand
+     * @param BrandRequest $request
+     * @return mixed
+     */
+    private function brandData(Brand $brand = null, BrandRequest $request): mixed
+    {
+        $data = $request->validated();
+        $data['slug'] = Str::slug($data['name']);
+        if ($request->hasFile('logo')) {
+            if ($brand && $image = Storage::disk('public')) {
+                $image->delete($brand->logo);
+            }
+            $filename = $request->file('logo')->store('brand', 'public');
+            Storage::disk('public')->path($filename);
+            $data['logo'] = $filename;
+        }
+        return $data;
     }
 }
