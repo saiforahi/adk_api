@@ -18,7 +18,7 @@ class BrandController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $brands = Brand::query()->get();
+        $brands = Brand::query()->latest()->get();
         return $this->success($brands);
     }
 
