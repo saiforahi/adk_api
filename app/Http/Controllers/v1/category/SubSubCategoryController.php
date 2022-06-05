@@ -56,7 +56,6 @@ class SubSubCategoryController extends Controller
     {
         try {
             $data = $this->categoryData($request, $subSubCategory);
-            dd($data);
             $subSubCategory->update($data);
             return $this->success($subSubCategory);
         } catch (\Exception $exception) {
