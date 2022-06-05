@@ -5,10 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class SubCategory extends Model
+class SubSubCategory extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -17,22 +16,14 @@ class SubCategory extends Model
     protected $casts = [
         'featured' => 'boolean',
         'digital' => 'boolean',
-        'category_id' => 'integer'
+        'sub_category_id' => 'integer'
     ];
 
     /**
      * @return BelongsTo
      */
-    public function category(): BelongsTo
+    public function sub_category(): BelongsTo
     {
-        return $this->belongsTo(Category::class, 'category_id', 'id');
-    }
-
-    /**
-     * @return HasMany
-     */
-    public function sub_sub_category(): HasMany
-    {
-        return $this->hasMany(SubSubCategory::class);
+        return $this->belongsTo(SubCategory::class, 'sub_category_id', 'id');
     }
 }
