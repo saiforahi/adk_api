@@ -41,27 +41,27 @@ return [
         ],
 
         'admin' => [
-            'driver' => 'session',
+            'driver' => 'sanctum',
             'provider' => 'admins',
         ],
         'dealer' => [
-            'driver' => 'session',
-            'provider' => 'couriers',
+            'driver' => 'sanctum',
+            'provider' => 'dealers',
         ],
 
         'subdealer' => [
-            'driver' => 'token',
-            'provider' => 'users',
+            'driver' => 'sanctum',
+            'provider' => 'sub_dealers',
             'hash' => false,
         ],
         'predealer' => [
-            'driver' => 'token',
-            'provider' => 'admins',
+            'driver' => 'sanctum',
+            'provider' => 'pre_dealers',
             'hash' => false,
         ],
         'staff' => [
             'driver' => 'sanctum',
-            'provider' => 'couriers',
+            'provider' => 'users',
             'hash' => false,
         ],
     ],
@@ -92,9 +92,21 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Admin::class,
         ],
-        'couriers' => [
+        'dealers' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Courier::class,
+            'model' => App\Models\Dealer::class,
+        ],
+        'sub_dealers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\SubDealer::class,
+        ],
+        'pre_dealers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\PreDealer::class,
+        ],
+        'staff' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\User::class,
         ],
 
         // 'users' => [
@@ -131,8 +143,26 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
-        'couriers' => [
-            'provider' => 'couriers',
+        'dealers' => [
+            'provider' => 'dealers',
+            'table' => 'password_resets',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'sub_dealers' => [
+            'provider' => 'sub_dealers',
+            'table' => 'password_resets',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'pre_dealers' => [
+            'provider' => 'pre_dealers',
+            'table' => 'password_resets',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'staff' => [
+            'provider' => 'users',
             'table' => 'password_resets',
             'expire' => 60,
             'throttle' => 60,
