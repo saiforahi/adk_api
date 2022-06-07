@@ -20,7 +20,6 @@ return new class extends Migration {
             $table->unsignedBigInteger('sub_sub_category_id')->nullable();
             $table->string('name', 200);
             $table->mediumText('sort_desc')->nullable();
-            $table->nullableMorphs('added_by');
             $table->mediumText('property_options')->nullable();
             $table->integer('unit')->nullable();
             $table->string('weight', 100)->nullable();
@@ -42,6 +41,7 @@ return new class extends Migration {
             $table->integer('num_of_sale')->default(0);
             $table->mediumText('slug');
             $table->boolean('digital')->default(0);
+            $table->nullableMorphs('added_by');
             $table->softDeletes();
             $table->timestamps();
         });

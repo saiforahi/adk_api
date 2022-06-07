@@ -7,7 +7,6 @@ use App\Http\Requests\ProductRequest;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -29,7 +28,8 @@ class ProductController extends Controller
     public function store(ProductRequest $request): JsonResponse
     {
         try {
-            $data = $this->productData($request);
+            $data = $request->validated();
+            $data['slug'] = Str::slug($data['name']);
             $product = Product::query()->create($data);
             return $this->success($product);
         } catch (\Exception $exception) {
@@ -54,7 +54,8 @@ class ProductController extends Controller
     public function update(Product $product, ProductRequest $request): JsonResponse
     {
         try {
-            $data = $this->productData($request, $product);
+            $data = $request->validated();
+            $data['slug'] = Str::slug($data['name']);
             $product->update($data);
             return $this->success($product);
         } catch (\Exception $exception) {
@@ -68,32 +69,7 @@ class ProductController extends Controller
      */
     public function destroy(Product $product): JsonResponse
     {
-        if (Storage::disk('public')->exists($product->icon)) {
-            Storage::disk('public')->delete($product->icon);
-        }
-        if (Storage::disk('public')->exists($product->banner)) {
-            Storage::disk('public')->delete($product->banner);
-        }
         $product->delete();
         return $this->success($product, 'Product Deleted Successfully');
-    }
-
-    /**
-     * @param ProductRequest $request
-     * @param Product|null $product
-     * @return mixed
-     */
-    private function productData(ProductRequest $request, Product $product = null): mixed
-    {
-        $data = $request->validated();
-        $data['slug'] = Str::slug($data['name']);
-        if ($request->hasFile('icon')) {
-            if ($product && $image = Storage::disk('public')) {
-                $image->delete($product->icon);
-            }
-            $icon = $request->file('icon')->store('category', 'public');
-            $data['icon'] = $icon;
-        }
-        return $data;
     }
 }
