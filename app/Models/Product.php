@@ -51,4 +51,9 @@ class Product extends Model
     {
         return $this->belongsTo(SubSubCategory::class, 'sub_sub_category_id', 'id');
     }
+
+    public function added_by()
+    {
+        return $this->morphTo();
+    }
 }
