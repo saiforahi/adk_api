@@ -17,7 +17,7 @@ class ProductController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $products = Product::query()->latest()->get();
+        $products = Product::with('stock')->latest()->get();
         return $this->success($products);
     }
 
