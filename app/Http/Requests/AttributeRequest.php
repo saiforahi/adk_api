@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class ProductStockRequest extends FormRequest
+class AttributeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,17 +25,12 @@ class ProductStockRequest extends FormRequest
     public function rules()
     {
         return [
-            'product_id' => [
+            'name' => [
                 'required',
-                'exists:products,id',
-                Rule::unique('product_stocks')
-                    ->ignore($this->product_stock)
+                Rule::unique('attributes')
+                    ->ignore($this->attribute)
                     ->whereNull('deleted_at')
-            ],
-            'variant' => 'nullable',
-            'sku' => 'nullable',
-            'quantity' => 'required',
-            'price' => 'required'
+            ]
         ];
     }
 }

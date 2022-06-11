@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends Factory
  */
-class ProductGroupFactory extends Factory
+class AttributeFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,7 +18,6 @@ class ProductGroupFactory extends Factory
     {
         return [
             'name' => $this->faker->word,
-            'group' => $this->faker->word
         ];
     }
 }

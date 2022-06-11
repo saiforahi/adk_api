@@ -18,7 +18,7 @@ class CategoryController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $categories = Category::with(['sub_category', 'sub_category.sub_sub_category'])->get();
+        $categories = Category::with(['sub_category', 'sub_category.sub_sub_category'])->latest()->get();
         return $this->success($categories);
     }
 
