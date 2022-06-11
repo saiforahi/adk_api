@@ -13,7 +13,12 @@ class Supplier extends Model implements HasMedia
 {
     use HasFactory,InteractsWithMedia,SoftDeletes;
     protected $guarded=[];
-
+    protected $casts = [
+        'created_at'=>'datetime:Y-m-d h:i:s A',
+        'updated_at'=>'datetime:Y-m-d h:i:s A',
+        'deleted_at'=>'datetime:Y-m-d h:i:s A',
+        'company'=>'array'
+    ];
     public function registerMediaConversions(Media $media = null): void
     {
         $this->addMediaConversion('thumb')
@@ -27,6 +32,15 @@ class Supplier extends Model implements HasMedia
               
         $this->addMediaConversion('thumb-cropped')
             ->crop('crop-center', 400, 400)->queued();; // Trim or crop the image to the center for specified width and height.
+    }
+    public function registerMediaCollections(): void
+    {
+        // $this->addMediaCollection('thumb')->useDisk('public')->acceptsMimeTypes(['image/jpeg','image/jpg','image/png','image/webp'])->withResponsiveImages();
+        $this
+            ->addMediaCollection('image')
+            ->useDisk('public')
+            ->acceptsMimeTypes(['image/jpeg','image/jpg','image/png','image/webp'])
+            ->withResponsiveImages();
     }
 
 }

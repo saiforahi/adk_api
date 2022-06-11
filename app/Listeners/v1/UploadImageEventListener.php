@@ -6,7 +6,7 @@ use App\Events\v1\UploadImageEvent as UploadImageEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class UploadImageEventListener implements ShouldQueue
+class UploadImageEventListener
 {
     /**
      * Create the event listener.
@@ -27,5 +27,8 @@ class UploadImageEventListener implements ShouldQueue
     public function handle(UploadImageEvent $event)
     {
         //
+        foreach($event->images as $image){
+            $event->model->addMedia($image)->toMediaCollection($event->collection);
+        }
     }
 }

@@ -13,17 +13,19 @@ use Illuminate\Queue\SerializesModels;
 class UploadImageEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    private $model;
-    private $images;
+    public $model;
+    public $images;
+    public $collection;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($model,$images)
+    public function __construct($model,$images,$collection)
     {
         $this->model=$model;
         $this->images=$images;
+        $this->collection=$collection;
     }
 
     /**

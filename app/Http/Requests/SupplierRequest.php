@@ -29,10 +29,11 @@ class SupplierRequest extends FormRequest
             'company_contact'=>'required|string|max:255',
             'first_name'=>'required|string|max:255',
             'last_name'=>'sometimes|nullable|string|max:255',
-            'email'=>'required|email',
-            'phone'=>'required|string|max:20|min:9',
+            'email'=>'required|email|unique:suppliers,email',
+            'phone'=>'required|string|max:20|min:9||unique:suppliers,phone',
             'address'=>'sometimes|nullable',
-            'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
+            // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
+            'image' => 'nullable',
         ];
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Events\v1\UploadImageEvent;
+use App\Listeners\v1\UploadImageEventListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -18,8 +20,8 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        Registered::class => [
-            SendEmailVerificationNotification::class,
+        UploadImageEvent::class => [
+            UploadImageEventListener::class,
         ],
     ];
 

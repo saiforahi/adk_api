@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SupplierRequest;
 use App\Models\Supplier;
 use Exception;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -24,16 +25,30 @@ class SupplierController extends Controller
     public function _store(SupplierRequest $req):JsonResponse
     {
         try{
-            $new_supplier = Supplier::create(array_merge($req->except('company_name','company_contact'),['company'=>array('name'=>$req->company_name,'contact'=>$req->company_contact)]));
-            $images=array();
-            if($req->has('total_images') && $req->total_images>0){
-                for($index=1;$index<=$req->total_images;$index++){
-                    if($req->hasFile('image'.$index) && $req->file('image'.$index)->isValid()){
-                        array_push($images,$req->file('image'.$index));
-                    }
-                }
+            $validator = Validator::make($req->all(), [
+                //
+                'company_name'=>'required|string|max:255',
+                'company_contact'=>'required|string|max:255',
+                'first_name'=>'required|string|max:255',
+                'last_name'=>'sometimes|nullable|string|max:255',
+                'email'=>'required|email|unique:suppliers,email',
+                'phone'=>'required|string|max:20|min:9||unique:suppliers,phone',
+                'address'=>'sometimes|nullable',
+                // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
+                'image' => 'nullable',
+            ]);
+     
+            if ($validator->fails()) {
+                return $this->failed(null, $validator->errors, 500);
+                
             }
-            event(new UploadImageEvent($new_supplier,$images));
+            $new_supplier = Supplier::create(array_merge($req->except('company_name','company_contact','image'),array('company'=>array('name'=>$req->company_name,'contact'=>$req->company_contact))));
+            $images=array();
+            if($req->hasFile('image') && $req->file('image')->isValid()){
+                array_push($images,$req->file('image'));
+            }
+            // dd($images);
+            event(new UploadImageEvent($new_supplier,$images,'image'));
             if($new_supplier){
                 return $this->success($new_supplier);
             }
