@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+
 use App\Models\Attribute;
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\SubCategory;
 use App\Models\SubSubCategory;
@@ -19,6 +21,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        Brand::factory(10)->create();
         Category::factory(10)->create();
         SubCategory::factory(10)->create();
         SubSubCategory::factory(10)->create();
