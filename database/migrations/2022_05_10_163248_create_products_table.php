@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProductsTable extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -15,14 +14,13 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('brand_id')->nullable();
+            $table->unsignedBigInteger('category_id')->nullable();
+            $table->unsignedBigInteger('sub_category_id')->nullable();
+            $table->unsignedBigInteger('sub_sub_category_id')->nullable();
             $table->string('name', 200);
             $table->mediumText('sort_desc')->nullable();
-            $table->nullableMorphs('added_by');
-            $table->integer('category_id')->nullable();
-            $table->integer('subcategory_id')->nullable();
-            $table->integer('subsubcategory_id')->nullable();
             $table->mediumText('property_options')->nullable();
-            $table->integer('brand_id')->nullable();
             $table->integer('unit')->nullable();
             $table->string('weight', 100)->nullable();
             $table->string('length', 10)->nullable();
@@ -32,9 +30,10 @@ class CreateProductsTable extends Migration
             $table->mediumText('colors')->nullable();
             $table->string('attributes', 1000)->nullable();
             $table->mediumText('attribute_options')->nullable();
-            $table->boolean('orderQtyLimit')->default(0);
-            $table->string('orderQtyLimitMax', 10)->nullable();
-            $table->string('orderQtyLimitMin', 10)->nullable();
+            $table->boolean('order_quantity_limit')->default(0);
+            $table->string('order_quantity_max')->nullable();
+            $table->string('order_quantity_min')->nullable();
+            $table->boolean('price_type')->default(0);
             $table->double('unit_price', 8, 2)->nullable();
             $table->integer('currency_id')->nullable();
             $table->integer('quantity')->nullable();
@@ -42,6 +41,8 @@ class CreateProductsTable extends Migration
             $table->integer('num_of_sale')->default(0);
             $table->mediumText('slug');
             $table->boolean('digital')->default(0);
+            $table->nullableMorphs('added_by');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -55,4 +56,4 @@ class CreateProductsTable extends Migration
     {
         Schema::dropIfExists('products');
     }
-}
+};

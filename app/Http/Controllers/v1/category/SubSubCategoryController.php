@@ -19,7 +19,7 @@ class SubSubCategoryController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $subSubCategory = SubSubCategory::with('sub_category')->latest()->get();
+        $subSubCategory = SubSubCategory::with('sub_category')->get();
         return $this->success($subSubCategory);
     }
 
