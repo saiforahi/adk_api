@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->string('slug')->nullable()->unique();
             $table->integer('top')->default(0);
             $table->integer('serial')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
