@@ -93,4 +93,9 @@ class SupplierController extends Controller
             return $this->failed(null, $e->getMessage(), 500);
         }
     }
+    public function _delete(Supplier $supplier): JsonResponse
+    {
+        $supplier->delete();
+        return $this->success($supplier, 'Supplier Deleted Successfully');
+    }
 }
