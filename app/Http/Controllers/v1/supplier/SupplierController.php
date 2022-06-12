@@ -25,23 +25,7 @@ class SupplierController extends Controller
     public function _store(SupplierRequest $req):JsonResponse
     {
         try{
-            $validator = Validator::make($req->all(), [
-                //
-                'company_name'=>'required|string|max:255',
-                'company_contact'=>'required|string|max:255',
-                'first_name'=>'required|string|max:255',
-                'last_name'=>'sometimes|nullable|string|max:255',
-                'email'=>'required|email|unique:suppliers,email',
-                'phone'=>'required|string|max:20|min:9||unique:suppliers,phone',
-                'address'=>'sometimes|nullable',
-                // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
-                'image' => 'nullable',
-            ]);
-     
-            if ($validator->fails()) {
-                return $this->failed(null, $validator->errors, 500);
-                
-            }
+            
             $new_supplier = Supplier::create(array_merge($req->except('company_name','company_contact','image'),array('company'=>array('name'=>$req->company_name,'contact'=>$req->company_contact))));
             $images=array();
             if($req->hasFile('image') && $req->file('image')->isValid()){
@@ -75,10 +59,23 @@ class SupplierController extends Controller
 
 
     // update supplier details
-    public function _update(SupplierRequest $req):JsonResponse
+    public function _update(Supplier $supplier,Request $req):JsonResponse
     {
         try{
-            return $this->success(Supplier::all());
+            // dd($req->all());
+            $req->validate([
+                'company_name'=>'required|string|max:255',
+                'company_contact'=>'required|string|max:255',
+                'first_name'=>'required|string|max:255',
+                'last_name'=>'sometimes|nullable|string|max:255',
+                'email'=>'required|email|exists:suppliers,email',
+                'phone'=>'required|string|max:20|min:9||unique:suppliers,phone',
+                'address'=>'sometimes|nullable',
+                // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
+                'image' => 'nullable',
+            ]);
+            $supplier->update(array_merge($req->except('company_name','company_contact','image'),array('company'=>array('name'=>$req->company_name,'contact'=>$req->company_contact))));
+            return $this->success($supplier);
         }
         catch(Exception $e){
             return $this->failed(null, $e->getMessage(), 500);

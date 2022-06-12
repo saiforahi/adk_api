@@ -1,8 +1,5 @@
 <?php
 
-use App\Http\Controllers\v1\category\CategoryController;
-use App\Http\Controllers\v1\category\SubCategoryController;
-use App\Http\Controllers\v1\category\SubSubCategoryController;
 use App\Http\Controllers\v1\supplier\SupplierController;
 use Illuminate\Support\Facades\Route;
 
