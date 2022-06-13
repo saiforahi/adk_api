@@ -10,6 +10,10 @@ use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use lemonpatwari\bangladeshgeocode\Models\Division;
+use lemonpatwari\bangladeshgeocode\Models\District;
+use lemonpatwari\bangladeshgeocode\Models\Thana;
+use lemonpatwari\bangladeshgeocode\Models\Union;
 
 class SupplierController extends Controller
 {
