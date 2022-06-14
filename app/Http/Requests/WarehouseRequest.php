@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class WarehouseRequest extends FormRequest
 {
@@ -24,7 +25,12 @@ class WarehouseRequest extends FormRequest
     public function rules()
     {
         return [
-            'code' => 'required|unique:warehouses,id',
+            'code' => [
+                'required',
+                Rule::unique('warehouses')
+                    ->ignore($this->warehouse)
+                    ->whereNull('deleted_at')
+            ],
             'name' => 'required',
             'address' => 'required',
             'capacity' => 'required',

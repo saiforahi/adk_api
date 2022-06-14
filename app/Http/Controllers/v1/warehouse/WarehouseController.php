@@ -19,6 +19,9 @@ class WarehouseController extends Controller
     public function index(Request $request): JsonResponse
     {
         $warehouses = Warehouse::query()->get();
+        $warehouses = $warehouses->transform(function ($item, $key) {
+            return $this->getImages($item);
+        });
         return $this->success($warehouses);
     }
 
@@ -30,7 +33,9 @@ class WarehouseController extends Controller
     {
         try {
             $warehouse = Warehouse::query()->create(Arr::except($request->validated(), 'image'));
-            $this->uploadImage($request, $warehouse);
+            if ($request->hasFile('image')) {
+                $this->uploadImage($request, $warehouse);
+            }
             return $this->success($warehouse);
         } catch (\Exception $exception) {
             return $this->failed(null, $exception->getMessage(), 500);
@@ -43,6 +48,7 @@ class WarehouseController extends Controller
      */
     public function show(Warehouse $warehouse): JsonResponse
     {
+        $this->getImages($warehouse);
         return $this->success($warehouse);
     }
 
@@ -55,6 +61,10 @@ class WarehouseController extends Controller
     {
         try {
             $warehouse->update(Arr::except($request->validated(), 'image'));
+            $warehouse->getMedia();
+            if ($request->hasFile('image')) {
+                $this->uploadImage($request, $warehouse);
+            }
             return $this->success($warehouse);
         } catch (\Exception $exception) {
             return $this->failed(null, $exception->getMessage(), 500);
@@ -67,16 +77,40 @@ class WarehouseController extends Controller
      */
     public function destroy(Warehouse $warehouse): JsonResponse
     {
+        $warehouse->getMedia();
+        if ($warehouse->media) {
+            $warehouse->media->each(function ($item) {
+                $item->delete();
+            });
+        }
         $warehouse->delete();
         return $this->success($warehouse, 'Warehouse Deleted Successfully');
     }
 
-    public function uploadImage(Request $request, $warehouse)
+    protected function uploadImage(Request $request, $warehouse)
     {
+        if ($warehouse->media) {
+            $warehouse->media->each(function ($item) {
+                $item->delete();
+            });
+        }
         $images = [];
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             $images[] = $request->file('image');
         }
         event(new UploadImageEvent($warehouse, $images, 'image'));
+    }
+
+    protected function getImages($warehouse)
+    {
+        $warehouse['image_url'] = null;
+        $warehouse->getMedia();
+        if ($warehouse->media) {
+            $warehouse->media->each(function ($item) use ($warehouse) {
+                $warehouse['image_url'] = $item->getFullUrl();
+            });
+        }
+        $warehouse->makeHidden('media');
+        return $warehouse;
     }
 }
