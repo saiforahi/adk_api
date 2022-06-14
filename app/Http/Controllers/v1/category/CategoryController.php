@@ -8,6 +8,7 @@ use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -41,20 +42,10 @@ class CategoryController extends Controller
     {
         try {
 
-            $data = $request->validated();
+            $data = Arr::except($request->validated(), ['icon', 'banner']);
             $data['slug'] = Str::slug($data['name']);
             $category = Category::query()->create($data);
-            $icons = [];
-            $banners = [];
-            if ($request->hasFile('icon') && $request->file('icon')->isValid()) {
-                $icons[] = $request->file('icon');
-            }
-            if ($request->hasFile('banner') && $request->file('banner')->isValid()) {
-                $banners[] = $request->file('banner');
-            }
-            event(new UploadImageEvent($category, $icons, 'icon'));
-            event(new UploadImageEvent($category, $banners, 'banner'));
-//            $this->uploadImage($request, $category);
+            $this->uploadImage($request, $category);
             return $this->success($category);
         } catch (\Exception $exception) {
             return $this->failed(null, $exception->getMessage(), 500);
@@ -67,6 +58,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category): JsonResponse
     {
+        $this->getImages($category);
         return $this->success($category->load('media', 'sub_category'));
     }
 
@@ -78,8 +70,10 @@ class CategoryController extends Controller
     public function update(Category $category, CategoryRequest $request): JsonResponse
     {
         try {
-            $data = $this->categoryData($request, $category);
+            $data = Arr::except($request->validated(), ['icon', 'banner']);
+            $data['slug'] = Str::slug($data['name']);
             $category->update($data);
+            $this->uploadImage($request, $category);
             return $this->success($category);
         } catch (\Exception $exception) {
             return $this->failed(null, $exception->getMessage(), 500);
@@ -92,48 +86,75 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category): JsonResponse
     {
-        if (Storage::disk('public')->exists($category->icon)) {
-            Storage::disk('public')->delete($category->icon);
+        try {
+            $icons = $category->getMedia('icon');
+            $banners = $category->getMedia('banner');
+            $icons?->each(function ($item) {
+                $item->delete();
+            });
+            $banners?->each(function ($item) {
+                $item->delete();
+            });
+            $category->delete();
+            return $this->success($category, 'Category Deleted Successfully');
+        } catch (\Exception $exception) {
+            return $this->failed(null, $exception->getMessage());
         }
-        if (Storage::disk('public')->exists($category->banner)) {
-            Storage::disk('public')->delete($category->banner);
-        }
-        $category->delete();
-        return $this->success($category, 'Category Deleted Successfully');
     }
 
     /**
      * @param CategoryRequest $request
-     * @param Category $category
+     * @param $category
      * @return void
      */
-    private function uploadImage(CategoryRequest $request, Category $category): void
+
+    protected function uploadImage(Request $request, $category): void
     {
+        $icons = $category->getMedia('icon');
+        $banners = $category->getMedia('banner');
+        if ($icons) {
+            $icons->each(function ($item) {
+                $item->delete();
+            });
+        }
+        if ($banners) {
+            $banners->each(function ($item) {
+                $item->delete();
+            });
+        }
         $icons = [];
         $banners = [];
         if ($request->hasFile('icon') && $request->file('icon')->isValid()) {
             $icons[] = $request->file('icon');
+            event(new UploadImageEvent($category, $icons, 'icon'));
         }
         if ($request->hasFile('banner') && $request->file('banner')->isValid()) {
             $banners[] = $request->file('banner');
+            event(new UploadImageEvent($category, $banners, 'banner'));
         }
-        event(new UploadImageEvent($category, $icons, 'icon'));
-        event(new UploadImageEvent($category, $banners, 'banner'));
+    }
 
-
-//        if ($request->hasFile('icon')) {
-//            if ($category && $image = Storage::disk('public')) {
-//                $image->delete($category->icon);
-//            }
-//            $icon = $request->file('icon')->store('category', 'public');
-//            $data['icon'] = $icon;
-//        }
-//        if ($request->hasFile('banner')) {
-//            if ($category && $image = Storage::disk('public')) {
-//                $image->delete($category->banner);
-//            }
-//            $banner = $request->file('banner')->store('category', 'public');
-//            $data['banner'] = $banner;
-//        }
+    /**
+     * @param $category
+     * @return mixed
+     */
+    protected function getImages($category): mixed
+    {
+        $category['icon_image_url'] = null;
+        $category['banner_image_url'] = null;
+        $icons = $category->getMedia('icon');
+        $banners = $category->getMedia('banner');
+        if ($icons) {
+            $icons->each(function ($item) use ($category) {
+                $category['icon_image_url'] = $item->getFullUrl();
+            });
+        }
+        if ($banners) {
+            $banners->each(function ($item) use ($category) {
+                $category['banner_image_url'] = $item->getFullUrl();
+            });
+        }
+        $category->makeHidden('media');
+        return $category;
     }
 }
