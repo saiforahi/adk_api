@@ -12,6 +12,19 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Warehouse extends Model implements HasMedia
 {
-    use HasFactory,InteractsWithMedia,SoftDeletes;
-    protected $table="warehouses";
+    use HasFactory, InteractsWithMedia, SoftDeletes;
+
+    protected $table = "warehouses";
+
+    protected $guarded = [];
+
+    public function registerMediaConversions(Media $media = null): void
+    {
+
+    }
+
+    public function registerMediaCollections(): void
+    {
+
+    }
 }
