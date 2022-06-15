@@ -135,12 +135,12 @@ class SubCategoryController extends Controller
         $icons = $subCategory->getMedia('icon');
         $banners = $subCategory->getMedia('banner');
         if ($icons) {
-            $icons->each(function ($item) use ($category) {
+            $icons->each(function ($item) use ($subCategory) {
                 $subCategory['icon_image_url'] = $item->getFullUrl();
             });
         }
         if ($banners) {
-            $banners->each(function ($item) use ($category) {
+            $banners->each(function ($item) use ($subCategory) {
                 $subCategory['banner_image_url'] = $item->getFullUrl();
             });
         }
