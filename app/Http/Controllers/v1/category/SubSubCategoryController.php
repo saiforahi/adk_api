@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\v1\category;
 
+use App\Events\v1\UploadImageEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SubCategoryRequest;
 use App\Http\Requests\SubSubCategoryRequest;
@@ -77,6 +78,54 @@ class SubSubCategoryController extends Controller
         }
         $subSubCategory->delete();
         return $this->success($subSubCategory, 'Sub Sub-Category Deleted Successfully');
+    }
+
+
+
+    protected function uploadImage(Request $request, $subCategory): void
+    {
+        $icons = $subCategory->getMedia('icon');
+        $banners = $subCategory->getMedia('banner');
+        if ($icons) {
+            $icons->each(function ($item) {
+                $item->delete();
+            });
+        }
+        if ($banners) {
+            $banners->each(function ($item) {
+                $item->delete();
+            });
+        }
+        $icons = [];
+        $banners = [];
+        if ($request->hasFile('icon') && $request->file('icon')->isValid()) {
+            $icons[] = $request->file('icon');
+            event(new UploadImageEvent($subCategory, $icons, 'icon'));
+        }
+        if ($request->hasFile('banner') && $request->file('banner')->isValid()) {
+            $banners[] = $request->file('banner');
+            event(new UploadImageEvent($subCategory, $banners, 'banner'));
+        }
+    }
+
+    protected function getImages($subSubCategory): mixed
+    {
+        $subSubCategory['icon_image_url'] = null;
+        $subSubCategory['banner_image_url'] = null;
+        $icons = $subSubCategory->getMedia('icon');
+        $banners = $subSubCategory->getMedia('banner');
+        if ($icons) {
+            $icons->each(function ($item) use ($subSubCategory) {
+                $subSubCategory['icon_image_url'] = $item->getFullUrl();
+            });
+        }
+        if ($banners) {
+            $banners->each(function ($item) use ($subSubCategory) {
+                $subCategory['banner_image_url'] = $item->getFullUrl();
+            });
+        }
+        $subSubCategory->makeHidden('media');
+        return $subSubCategory;
     }
 
     /**
