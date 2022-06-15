@@ -21,7 +21,7 @@ class SubCategoryController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $subCategories = SubCategory::with(['category', 'sub_sub_category'])->get();
+        $subCategories = SubCategory::with(['category', 'sub_sub_category'])->latest()->get();
         $subCategories = $subCategories->transform(function ($item, $key) {
             foreach ($item->getMedia('icon') as $media) {
                 $item['icon_image_url'] = $media->getFullUrl();
