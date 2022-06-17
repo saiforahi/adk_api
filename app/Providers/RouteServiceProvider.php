@@ -36,12 +36,11 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
 
-            Route::middleware('api')
-                ->prefix('api')
+            Route::middleware('api')->prefix('api')
                 ->namespace($this->namespace)
                 ->group(base_path('routes/brand.php'));
-            Route::middleware('api')
-                ->prefix('api')
+
+            Route::middleware('api')->prefix('api')
                 ->namespace($this->namespace)
                 ->group(base_path('routes/category.php'));
             Route::middleware('api')
@@ -49,13 +48,17 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('routes/product.php'));
             Route::middleware('api')
-                ->prefix('api')
+                ->prefix('api/supplier')
                 ->namespace($this->namespace)
                 ->group(base_path('routes/supplier.php'));
             Route::middleware('api')
                 ->prefix('api')
                 ->namespace($this->namespace)
                 ->group(base_path('routes/warehouse.php'));
+            Route::middleware('api')
+                ->prefix('api/dealer')
+                ->namespace($this->namespace)
+                ->group(base_path('routes/dealer.php'));
         });
     }
 

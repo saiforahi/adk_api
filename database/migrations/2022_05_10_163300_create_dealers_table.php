@@ -16,15 +16,24 @@ return new class extends Migration
         Schema::create('dealers', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('dealer_type_id')->nullable();
+            $table->string('user_id')->unique();
+            $table->string('username')->unique();
             $table->string('first_name');
             $table->string('last_name')->nullable();
-            $table->string('email')->unique();
+            $table->string('email')->nullable()->unique();
             $table->string('phone')->unique()->nullable();
+            $table->mediumText('address')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->unsignedBigInteger('division_id')->nullable();
+            $table->unsignedBigInteger('district_id')->nullable();
+            $table->unsignedBigInteger('upazilla_id')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->foreign('dealer_type_id')->references('id')->on('dealer_types');
+            $table->foreign('division_id')->references('id')->on('divisions');
+            $table->foreign('district_id')->references('id')->on('districts');
+            $table->foreign('upazilla_id')->references('id')->on('thanas');
             $table->softDeletes($column = 'deleted_at', $precision = 0);
         });
     }
