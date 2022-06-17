@@ -20,6 +20,8 @@ return new class extends Migration
             $table->timestamps();
         });
         DealerType::create(array('name'=>'Division Dealer'));
+        DealerType::create(array('name'=>'District Dealer'));
+        DealerType::create(array('name'=>'Upazilla Dealer'));
     }
 
     /**
