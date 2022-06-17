@@ -5,14 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * @property int id
  * @property string name
  **/
-class Brand extends Model
+class Brand extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, InteractsWithMedia;
 
     protected $fillable = [
         'name',
@@ -23,4 +26,14 @@ class Brand extends Model
         'top',
         'serial'
     ];
+
+    public function registerMediaConversions(Media $media = null): void
+    {
+
+    }
+
+    public function registerMediaCollections(): void
+    {
+
+    }
 }

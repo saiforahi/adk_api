@@ -21,7 +21,7 @@ return new class extends Migration {
             $table->string('name', 200);
             $table->mediumText('sort_desc')->nullable();
             $table->mediumText('property_options')->nullable();
-            $table->integer('unit')->nullable();
+            $table->string('unit')->nullable();
             $table->string('weight', 100)->nullable();
             $table->string('length', 10)->nullable();
             $table->string('width', 10)->nullable();

@@ -29,7 +29,7 @@ class Supplier extends Model implements HasMedia
         $this->addMediaConversion('old-picture')
               ->sepia()
               ->border(10, 'black', Manipulations::BORDER_OVERLAY)->queued();;
-              
+
         $this->addMediaConversion('thumb-cropped')
             ->crop('crop-center', 400, 400)->queued();; // Trim or crop the image to the center for specified width and height.
     }
@@ -37,7 +37,7 @@ class Supplier extends Model implements HasMedia
     {
         // $this->addMediaCollection('thumb')->useDisk('public')->acceptsMimeTypes(['image/jpeg','image/jpg','image/png','image/webp'])->withResponsiveImages();
         $this
-            ->addMediaCollection('image')
+            ->addMediaCollection('icons')
             ->useDisk('public')
             ->acceptsMimeTypes(['image/jpeg','image/jpg','image/png','image/webp'])
             ->withResponsiveImages();

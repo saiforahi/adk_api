@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\v1\category;
 
+use App\Events\v1\UploadImageEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SubCategoryRequest;
 use App\Models\Category;
 use App\Models\SubCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -19,8 +21,18 @@ class SubCategoryController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $subCategory = SubCategory::with(['category', 'sub_sub_category'])->get();
-        return $this->success($subCategory);
+        $subCategories = SubCategory::with(['category', 'sub_sub_category'])->latest()->get();
+        $subCategories = $subCategories->transform(function ($item, $key) {
+            foreach ($item->getMedia('icon') as $media) {
+                $item['icon_image_url'] = $media->getFullUrl();
+            }
+            foreach ($item->getMedia('banner') as $media) {
+                $item['banner_image_url'] = $media->getFullUrl();
+            }
+            $item->makeHidden('media');
+            return $item;
+        });
+        return $this->success($subCategories);
     }
 
     /**
@@ -30,8 +42,10 @@ class SubCategoryController extends Controller
     public function store(SubCategoryRequest $request): JsonResponse
     {
         try {
-            $data = $this->categoryData($request);
+            $data = Arr::except($request->validated(), ['icon', 'banner']);
+            $data['slug'] = Str::slug($data['name']);
             $subCategory = SubCategory::query()->create($data);
+            $this->uploadImage($request, $subCategory);
             return $this->success($subCategory);
         } catch (\Exception $exception) {
             return $this->failed(null, $exception->getMessage(), 500);
@@ -44,6 +58,7 @@ class SubCategoryController extends Controller
      */
     public function show(SubCategory $subCategory): JsonResponse
     {
+        $this->getImages($subCategory);
         return $this->success($subCategory->load('category'));
     }
 
@@ -55,8 +70,10 @@ class SubCategoryController extends Controller
     public function update(SubCategory $subCategory, SubCategoryRequest $request): JsonResponse
     {
         try {
-            $data = $this->categoryData($request, $subCategory);
+            $data = Arr::except($request->validated(), ['icon', 'banner']);
+            $data['slug'] = Str::slug($data['name']);
             $subCategory->update($data);
+            $this->uploadImage($request, $subCategory);
             return $this->success($subCategory);
         } catch (\Exception $exception) {
             return $this->failed(null, $exception->getMessage(), 500);
@@ -69,39 +86,65 @@ class SubCategoryController extends Controller
      */
     public function destroy(SubCategory $subCategory): JsonResponse
     {
-        if (Storage::disk('public')->exists($subCategory->icon)) {
-            Storage::disk('public')->delete($subCategory->icon);
+        try {
+            $icons = $subCategory->getMedia('icon');
+            $banners = $subCategory->getMedia('banner');
+            $icons?->each(function ($item) {
+                $item->delete();
+            });
+            $banners?->each(function ($item) {
+                $item->delete();
+            });
+            $subCategory->delete();
+            return $this->success($subCategory, 'Sub-Category Deleted Successfully');
+        } catch (\Exception $exception) {
+            return $this->failed(null, $exception->getMessage());
         }
-        if (Storage::disk('public')->exists($subCategory->banner)) {
-            Storage::disk('public')->delete($subCategory->banner);
-        }
-        $subCategory->delete();
-        return $this->success($subCategory, 'Sub-Category Deleted Successfully');
     }
 
-    /**
-     * @param SubCategoryRequest $request
-     * @param SubCategory|null $subCategory
-     * @return mixed
-     */
-    private function categoryData(SubCategoryRequest $request, SubCategory $subCategory = null): mixed
+    protected function uploadImage(Request $request, $subCategory): void
     {
-        $data = $request->validated();
-        $data['slug'] = Str::slug($data['name']);
-        if ($request->hasFile('icon')) {
-            if ($subCategory && $image = Storage::disk('public')) {
-                $image->delete($subCategory->icon);
-            }
-            $icon = $request->file('icon')->store('category/sub_category', 'public');
-            $data['icon'] = $icon;
+        $icons = $subCategory->getMedia('icon');
+        $banners = $subCategory->getMedia('banner');
+        if ($icons) {
+            $icons->each(function ($item) {
+                $item->delete();
+            });
         }
-        if ($request->hasFile('banner')) {
-            if ($subCategory && $image = Storage::disk('public')) {
-                $image->delete($subCategory->banner);
-            }
-            $banner = $request->file('banner')->store('category/sub_category', 'public');
-            $data['banner'] = $banner;
+        if ($banners) {
+            $banners->each(function ($item) {
+                $item->delete();
+            });
         }
-        return $data;
+        $icons = [];
+        $banners = [];
+        if ($request->hasFile('icon') && $request->file('icon')->isValid()) {
+            $icons[] = $request->file('icon');
+            event(new UploadImageEvent($subCategory, $icons, 'icon'));
+        }
+        if ($request->hasFile('banner') && $request->file('banner')->isValid()) {
+            $banners[] = $request->file('banner');
+            event(new UploadImageEvent($subCategory, $banners, 'banner'));
+        }
+    }
+
+    protected function getImages($subCategory): mixed
+    {
+        $category['icon_image_url'] = null;
+        $category['banner_image_url'] = null;
+        $icons = $subCategory->getMedia('icon');
+        $banners = $subCategory->getMedia('banner');
+        if ($icons) {
+            $icons->each(function ($item) use ($subCategory) {
+                $subCategory['icon_image_url'] = $item->getFullUrl();
+            });
+        }
+        if ($banners) {
+            $banners->each(function ($item) use ($subCategory) {
+                $subCategory['banner_image_url'] = $item->getFullUrl();
+            });
+        }
+        $subCategory->makeHidden('media');
+        return $subCategory;
     }
 }

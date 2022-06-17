@@ -26,7 +26,7 @@ class SupplierRequest extends FormRequest
         return [
             //
             'company_name'=>'required|string|max:255',
-            'company_contact'=>'required|string|max:255',
+//            'company_contact'=>'required|string|max:255',
             'first_name'=>'required|string|max:255',
             'last_name'=>'sometimes|nullable|string|max:255',
             'email'=>'required|email|unique:suppliers,email',
@@ -34,6 +34,7 @@ class SupplierRequest extends FormRequest
             'address'=>'sometimes|nullable',
             // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
             'image' => 'nullable',
+            'status' => 'boolean|nullable'
         ];
     }
 }
