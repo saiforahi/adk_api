@@ -25,6 +25,6 @@ class DatabaseSeeder extends Seeder
         SubSubCategory::factory(10)->create();
         ProductGroup::factory(10)->create();
         Product::factory(5)->create();
-//        $this->call(RoleAndPermissionsSeeder::class);
+        $this->call(RoleAndPermissionsSeeder::class);
     }
 }
