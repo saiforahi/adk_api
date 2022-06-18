@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * Class Category
@@ -16,9 +18,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property boolean $featured
  * @property boolean $digital
  */
-class Category extends Model
+class Category extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, InteractsWithMedia;
 
     protected $fillable = [
         'name',
@@ -43,5 +45,15 @@ class Category extends Model
     public function sub_category(): HasMany
     {
         return $this->hasMany(SubCategory::class);
+    }
+
+    public function registerMediaConversions(Media $media = null): void
+    {
+
+    }
+
+    public function registerMediaCollections(): void
+    {
+
     }
 }

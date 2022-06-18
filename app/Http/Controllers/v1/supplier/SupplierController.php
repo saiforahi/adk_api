@@ -23,13 +23,13 @@ class SupplierController extends Controller
         $this->middleware(['auth:admin'])->except([]);
         // $this->middleware('role:super-admin|unit-admin')->except([]);
     }
-    
-    
+
+
     // storing new supplier
     public function _store(SupplierRequest $req):JsonResponse
     {
         try{
-            
+
             $new_supplier = Supplier::create(array_merge($req->except('company_name','company_contact','image'),array('company'=>array('name'=>$req->company_name,'contact'=>$req->company_contact))));
             $images=array();
             if($req->hasFile('image') && $req->file('image')->isValid()){
