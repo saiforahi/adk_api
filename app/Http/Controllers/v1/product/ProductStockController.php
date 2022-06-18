@@ -16,7 +16,9 @@ class ProductStockController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $stocks = ProductStock::query()->latest()->get();
+        $stocks = ProductStock::leftJoin('products', 'product_stocks.product_id', 'products.id')
+        ->select('product_stocks.*', 'products.name as product_name')
+        ->latest()->get();
         return $this->success($stocks);
     }
 
