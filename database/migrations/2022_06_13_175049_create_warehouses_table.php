@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string('name');
             $table->string('address');
             $table->string('capacity');
+            $table->string('image', 100)->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

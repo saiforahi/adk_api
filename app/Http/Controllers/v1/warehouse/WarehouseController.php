@@ -103,11 +103,11 @@ class WarehouseController extends Controller
 
     protected function getImages($warehouse)
     {
-        $warehouse['image_url'] = null;
+        $warehouse['image'] = null;
         $warehouse->getMedia();
         if ($warehouse->media) {
             $warehouse->media->each(function ($item) use ($warehouse) {
-                $warehouse['image_url'] = $item->getFullUrl();
+                $warehouse['image'] = $item->getFullUrl();
             });
         }
         $warehouse->makeHidden('media');

@@ -34,7 +34,7 @@ class WarehouseRequest extends FormRequest
             'name' => 'required',
             'address' => 'required',
             'capacity' => 'required',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
+            'image' => 'required',
         ];
     }
 }
