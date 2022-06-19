@@ -69,7 +69,7 @@ class SupplierController extends Controller
             // dd($req->all());
             $req->validate([
                 'company_name'=>'required|string|max:255',
-                'company_contact'=>'required|string|max:255',
+//                'company_contact'=>'required|string|max:255',
                 'first_name'=>'required|string|max:255',
                 'last_name'=>'sometimes|nullable|string|max:255',
                 'email'=>'required|email|exists:suppliers,email',
