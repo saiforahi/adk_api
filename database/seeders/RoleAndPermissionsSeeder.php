@@ -34,11 +34,14 @@ class RoleAndPermissionsSeeder extends Seeder
         // $user->assignRole($role1);
 
         $user = \App\Models\Dealer::factory()->create([
+            'dealer_type_id'=>1,
             'first_name' => 'Mr',
             'last_name'=>'Dealer',
             'email' => 'dealer@mail.com',
             'phone'=> '01YXXXXXXXX',
             'password' => Hash::make('12345678'),
+            'username'=>'dealer1',
+            'user_id'=>'20221606100'
             //'gender' => 'Male',
         ]);
         // $user->assignRole($role2);

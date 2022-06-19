@@ -25,3 +25,12 @@ if (!function_exists('get_first_user_by_email')) {
         return  $user;
     }
 }
+if (!function_exists('generate_user_id')) {
+    function generate_user_id($model)
+    {
+        $id=date('Y').date('m').date('d').$model->all()->count();
+        while($model->where('user_id',$id)->exists()){
+            $id=date('Y').date('m').date('d').$model->all()->count();
+        }
+    }
+}
