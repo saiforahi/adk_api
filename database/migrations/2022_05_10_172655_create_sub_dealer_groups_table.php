@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('sub_dealer_groups', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('sub_dealer_id');
-            $table->foreign('sub_dealer_id')->references('id')->on('sub_dealers');
+            $table->foreign('sub_dealer_id')->references('id')->on('pre_n_sub_dealers');
             $table->timestamps();
         });
     }

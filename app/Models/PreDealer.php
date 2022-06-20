@@ -17,6 +17,7 @@ class PreDealer extends Authenticatable implements HasMedia,MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable,InteractsWithMedia,SoftDeletes;
     protected $guard_name = 'pre_dealer';
+    protected $table = 'pre_n_sub_dealers';
     protected $guarded=[];
     protected $hidden=['password','remember_token'];
     protected $casts = [
