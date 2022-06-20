@@ -51,12 +51,12 @@ return [
 
         'subdealer' => [
             'driver' => 'sanctum',
-            'provider' => 'sub_dealers',
+            'provider' => 'pre_n_sub_dealers',
             'hash' => false,
         ],
         'predealer' => [
             'driver' => 'sanctum',
-            'provider' => 'pre_dealers',
+            'provider' => 'pre_n_sub_dealers',
             'hash' => false,
         ],
         'staff' => [
@@ -150,13 +150,13 @@ return [
             'throttle' => 60,
         ],
         'sub_dealers' => [
-            'provider' => 'sub_dealers',
+            'provider' => 'pre_n_sub_dealers',
             'table' => 'password_resets',
             'expire' => 60,
             'throttle' => 60,
         ],
         'pre_dealers' => [
-            'provider' => 'pre_dealers',
+            'provider' => 'pre_n_sub_dealers',
             'table' => 'password_resets',
             'expire' => 60,
             'throttle' => 60,
