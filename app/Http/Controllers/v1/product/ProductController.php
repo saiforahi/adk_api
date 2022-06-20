@@ -43,7 +43,7 @@ class ProductController extends Controller
      */
     public function show(Product $product): JsonResponse
     {
-        return $this->success($product);
+        return $this->success($product->load('brand', 'category', 'sub_category', 'sub_sub_category'));
     }
 
     /**

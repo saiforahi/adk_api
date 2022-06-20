@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class DealerRequest extends FormRequest
 {
@@ -26,17 +27,30 @@ class DealerRequest extends FormRequest
     {
         return [
             //
-            'dealer_type_id'=>'required|exists:dealer_types,id',
-            'username'=>'required|string|max:255|unique:dealers,username',
-            'first_name'=>'required|string|max:255',
-            'last_name'=>'sometimes|nullable|string|max:255',
-            'email'=>'sometimes|nullable|email|max:255|unique:dealers,email',
-            'phone'=>'required|string|max:20|min:9|unique:dealers,phone',
-            'address'=>'sometimes|nullable|string',
+            'dealer_type_id' => 'required|exists:dealer_types,id',
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('dealers')
+                    ->ignore($this->dealer)
+            ],
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'sometimes|nullable|string|max:255',
+            'email' => 'sometimes|nullable|email|max:255|unique:dealers,email',
+            'phone' => [
+                'required',
+                'string',
+                'max:20',
+                'min:9',
+                Rule::unique('dealers')
+                    ->ignore($this->dealer)
+            ],
+            'address' => 'sometimes|nullable|string',
             'password' => 'required|string|min:8',
             // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
             // 'image' => 'nullable',
         ];
     }
-    
+
 }

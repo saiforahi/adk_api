@@ -19,7 +19,7 @@ class DealerController extends Controller
         $this->middleware(['auth:admin'])->except([]);
         // $this->middleware('role:super-admin|unit-admin')->except([]);
     }
-    
+
     public function _store(DealerRequest $req)
     {
         try{
