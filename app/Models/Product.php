@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
 /**
  * @property int $id
  * @property string $name
@@ -15,9 +19,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int $sub_category_id
  * @property int $sub_sub_category_id
  */
-class Product extends Model
+class Product extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, InteractsWithMedia;
 
     protected $guarded = [];
 
@@ -64,5 +68,15 @@ class Product extends Model
     public function stock(): HasOne
     {
         return $this->hasOne(ProductStock::class);
+    }
+
+    public function registerMediaConversions(Media $media = null): void
+    {
+
+    }
+
+    public function registerMediaCollections(): void
+    {
+
     }
 }
