@@ -26,11 +26,12 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->integer('placement_id');
+            $table->integer('placement_id')->nullable();
             $table->float('opening_balance');
             $table->string('password');
             $table->rememberToken();
             $table->dateTime('type_updated_at')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->foreign('sub_dealer_type_id')->references('id')->on('sub_dealer_types');
             $table->foreign('pre_dealer_type_id')->references('id')->on('pre_dealer_types');
