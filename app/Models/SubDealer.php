@@ -12,10 +12,11 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Permission\Traits\HasRoles;
 
 class SubDealer extends Authenticatable implements HasMedia,MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable,InteractsWithMedia,SoftDeletes;
+    use HasApiTokens, HasFactory,HasRoles, Notifiable,InteractsWithMedia,SoftDeletes;
     protected $guard_name = 'sub_dealer';
     protected $table="pre_n_sub_dealers";
     protected $guarded=[];

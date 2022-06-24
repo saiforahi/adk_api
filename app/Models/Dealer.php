@@ -17,6 +17,7 @@ class Dealer extends Authenticatable implements HasMedia,MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable,InteractsWithMedia,HasRoles,SoftDeletes;
     protected $guard_name = 'dealer';
+    protected $table='dealers';
     protected $guarded=[];
     protected $hidden=['password','remember_token'];
     protected $casts = [

@@ -10,6 +10,7 @@ use App\Models\SubSubCategory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Database\Seeders\RoleAndPermissionsSeeder;
+use Database\Seeders\SubPreSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -26,5 +27,6 @@ class DatabaseSeeder extends Seeder
         ProductGroup::factory(10)->create();
         Product::factory(5)->create();
         $this->call(RoleAndPermissionsSeeder::class);
+        $this->call(SubPreSeeder::class);
     }
 }
