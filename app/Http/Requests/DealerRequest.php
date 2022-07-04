@@ -37,7 +37,13 @@ class DealerRequest extends FormRequest
             ],
             'first_name' => 'required|string|max:255',
             'last_name' => 'sometimes|nullable|string|max:255',
-            'email' => 'sometimes|nullable|email|max:255|unique:dealers,email',
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('dealers')
+                    ->ignore($this->dealer)
+            ],
             'phone' => [
                 'required',
                 'string',

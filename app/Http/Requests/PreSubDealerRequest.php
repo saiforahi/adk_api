@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class PreSubDealerRequest extends FormRequest
 {
@@ -30,11 +31,33 @@ class PreSubDealerRequest extends FormRequest
             // 'reference_id'=>'required|string|max:255|exists:pre_n_sub_dealers,id',
             'placement_id'=>'required|numeric',
             'opening_balance'=>'required|numeric',
-            'username'=>'required|string|max:255|unique:pre_n_sub_dealers,username',
+            'username'=>'required|string|max:255|unique:,username',
+
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('pre_n_sub_dealers')
+                    ->ignore($this->dealer)
+            ],
+
             'first_name'=>'required|string|max:255',
             'last_name'=>'sometimes|nullable|string|max:255',
-            'email'=>'sometimes|nullable|email|max:255|unique:pre_n_sub_dealers,email',
-            'phone'=>'required|string|max:20|min:9|unique:pre_n_sub_dealers,phone',
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('pre_n_sub_dealers')
+                    ->ignore($this->dealer)
+            ],
+            'phone' => [
+                'required',
+                'string',
+                'max:20',
+                'min:9',
+                Rule::unique('pre_n_sub_dealers')
+                    ->ignore($this->dealer)
+            ],
             'address'=>'sometimes|nullable|string',
             'password' => 'required|string|min:8'
         ];
