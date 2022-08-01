@@ -20,7 +20,8 @@ class CategoryController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $categories = Category::with(['sub_category', 'sub_category.sub_sub_category'])->latest()->get();
+        // $categories = Category::with(['sub_category', 'sub_category.sub_sub_category'])->latest()->get();
+        $categories = Category::with(['sub_category'])->latest()->get();
         $categories = $categories->transform(function ($item, $key) {
             foreach ($item->getMedia('icon') as $media) {
                 $item['icon_image_url'] = $media->getFullUrl();

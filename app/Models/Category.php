@@ -24,20 +24,20 @@ class Category extends Model implements HasMedia
 
     protected $fillable = [
         'name',
-        'meta_title',
-        'meta_description',
+        // 'meta_title',
+        // 'meta_description',
         'icon',
         'banner',
-        'slug',
-        'commission_rate',
-        'featured',
-        'digital'
+        // 'slug',
+        // 'commission_rate',
+        // 'featured',
+        // 'digital'
     ];
 
-    protected $casts = [
-        'featured' => 'boolean',
-        'digital' => 'boolean'
-    ];
+    // protected $casts = [
+    //     'featured' => 'boolean',
+    //     'digital' => 'boolean'
+    // ];
 
     /**
      * @return HasMany

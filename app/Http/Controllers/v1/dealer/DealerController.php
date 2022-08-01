@@ -60,8 +60,10 @@ class DealerController extends Controller
     public function _update(Dealer $dealer,DealerRequest $req):JsonResponse
     {
         try{
-            // dd($req->all());
-            $data=array('password'=>Hash::make($req->password), 'user_id'=>date('Y').date('m').date('d').date('i').date('s'));
+            $data = [];
+            if ($req->password) {
+                $data=array('password'=>Hash::make($req->password));
+            }
             $dealer->update(array_merge($req->except('password'),$data));
             return $this->success($dealer);
         }

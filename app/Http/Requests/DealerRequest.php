@@ -28,6 +28,7 @@ class DealerRequest extends FormRequest
         return [
             //
             'dealer_type_id' => 'required|exists:dealer_types,id',
+            'reference_id'=>'required|string|max:255|exists:pre_n_sub_dealers,id',
             'username' => [
                 'required',
                 'string',
@@ -53,7 +54,7 @@ class DealerRequest extends FormRequest
                     ->ignore($this->dealer)
             ],
             'address' => 'sometimes|nullable|string',
-            'password' => 'required|string|min:8',
+            'password' => $this->dealer ? 'sometimes|nullable|min:8' : 'required|string|min:8'
             // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
             // 'image' => 'nullable',
         ];

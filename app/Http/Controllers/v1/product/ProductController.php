@@ -19,7 +19,7 @@ class ProductController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $products = Product::with(['stock', 'category', 'brand'])->latest()->get();
+        $products = Product::with(['stock', 'category', 'brand'])->select('*','products.unit_price as price')->latest()->get();
         $products = $products->transform(function ($item) {
             return $this->getImages($item);
         });

@@ -15,26 +15,37 @@ return new class extends Migration
     {
         Schema::create('pre_n_sub_dealers', function (Blueprint $table) {
             $table->id();
-            $table->enum('type',['sub','pre']);
-            $table->unsignedBigInteger('sub_dealer_type_id')->nullable();
-            $table->unsignedBigInteger('pre_dealer_type_id')->nullable();
+            $table->integer('placement_id')->nullable();
             $table->string('user_id')->unique();
             $table->string('username')->unique();
             $table->string('first_name');
             $table->string('last_name')->nullable();
-            $table->mediumText('address')->nullable();
-            $table->string('email')->unique();
+            $table->string('email')->nullable()->unique();
             $table->string('phone')->unique()->nullable();
+            $table->string('post_code')->nullable();
+            $table->string('nominee_name')->nullable();
+            $table->string('nid')->nullable();
+            $table->float('opening_balance')->default(0.0);
+            $table->string('nominee_phone')->nullable();
+            $table->string('nominee_nid')->nullable();
+            $table->mediumText('address')->nullable();
+            $table->mediumText('bank_details')->nullable();
+            $table->mediumText('nominee_address')->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->integer('placement_id')->nullable();
-            $table->float('opening_balance');
             $table->string('password');
-            $table->rememberToken();
-            $table->dateTime('type_updated_at')->nullable();
+            $table->unsignedBigInteger('country_id')->nullable();
+            $table->unsignedBigInteger('division_id')->nullable();
+            $table->unsignedBigInteger('district_id')->nullable();
+            $table->unsignedBigInteger('thana_id')->nullable();
+            $table->unsignedBigInteger('reference_id')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->rememberToken();
             $table->timestamps();
-            $table->foreign('sub_dealer_type_id')->references('id')->on('sub_dealer_types');
-            $table->foreign('pre_dealer_type_id')->references('id')->on('pre_dealer_types');
+            $table->foreign('division_id')->references('id')->on('divisions');
+            $table->foreign('district_id')->references('id')->on('districts');
+            $table->foreign('thana_id')->references('id')->on('thanas');
+            $table->foreign('country_id')->references('id')->on('countries');
+            $table->foreign('reference_id')->references('id')->on('pre_n_sub_dealers');
             $table->softDeletes($column = 'deleted_at', $precision = 0);
         });
     }

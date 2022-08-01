@@ -26,10 +26,8 @@ class PreSubDealerRequest extends FormRequest
     {
         return [
             //
-            'sub_dealer_type_id'=>'sometimes|nullable|exists:sub_dealer_types,id',
-            'pre_dealer_type_id'=>'sometimes|nullable|exists:pre_dealer_types,id',
-            // 'reference_id'=>'required|string|max:255|exists:pre_n_sub_dealers,id',
-            'placement_id'=>'required|numeric',
+            'reference_id'=>'required|string|max:255|exists:pre_n_sub_dealers,id',
+            'placement_id'=>'required|string|max:255|exists:pre_n_sub_dealers,user_id',
             'opening_balance'=>'required|numeric',
             'username'=>'required|string|max:255|unique:,username',
 
@@ -59,7 +57,7 @@ class PreSubDealerRequest extends FormRequest
                     ->ignore($this->dealer)
             ],
             'address'=>'sometimes|nullable|string',
-            'password' => 'required|string|min:8'
+            'password' => $this->dealer ? 'sometimes|nullable|min:8' : 'required|string|min:8'
         ];
     }
 }

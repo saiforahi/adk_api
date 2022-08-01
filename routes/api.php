@@ -20,3 +20,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/login',[App\Http\Controllers\v1\auth\AuthController::class,'login']);
 Route::post('/register',[App\Http\Controllers\v1\auth\AuthController::class,'register']);
 Route::middleware('auth:sanctum')->get('/logout',[App\Http\Controllers\v1\auth\AuthController::class,'logout']);
+Route::get('/geocode',[App\Http\Controllers\v1\common\DropdownController::class,'geocode']);
