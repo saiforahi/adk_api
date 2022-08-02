@@ -36,7 +36,7 @@ return new class extends Migration
             $table->unsignedBigInteger('division_id')->nullable();
             $table->unsignedBigInteger('district_id')->nullable();
             $table->unsignedBigInteger('thana_id')->nullable();
-            $table->unsignedBigInteger('reference_id')->nullable();
+            
             $table->boolean('is_active')->default(true);
             $table->rememberToken();
             $table->timestamps();
@@ -45,7 +45,7 @@ return new class extends Migration
             $table->foreign('district_id')->references('id')->on('districts');
             $table->foreign('thana_id')->references('id')->on('thanas');
             $table->foreign('country_id')->references('id')->on('countries');
-            $table->foreign('reference_id')->references('id')->on('pre_n_sub_dealers');
+            
             $table->softDeletes($column = 'deleted_at', $precision = 0);
         });
     }

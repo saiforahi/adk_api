@@ -13,11 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('countries', function (Blueprint $table) {
-            $table->id();
-			$table->string('code');
-			$table->string('name');
-            $table->timestamps();
+        Schema::table('dealers', function (Blueprint $table) {
+            $table->unsignedBigInteger('reference_id')->nullable();
+            $table->foreign('reference_id')->references('id')->on('dealers')->onDelete('cascade');
         });
     }
 
@@ -28,6 +26,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('countries');
+        Schema::table('dealers', function (Blueprint $table) {
+            $table->dropForeign(['reference_id']);
+            $table->dropColumn('reference_id');
+        });
     }
 };

@@ -15,10 +15,10 @@ class SubPreSeeder extends Seeder
      */
     public function run()
     {
-        $user = \App\Models\PreDealer::factory()->create([
+        $user = \App\Models\PreNSubDealer::factory()->create([
             'user_id'=>'1',
             'username'=>'predealer',
-            'type'=>'pre',
+            // 'type'=>'pre',
             'first_name' => 'Mr pre',
             'last_name'=>'dealer',
             'email' => 'predealer@mail.com',
@@ -27,11 +27,11 @@ class SubPreSeeder extends Seeder
             'opening_balance'=>1500
             //'last_login_ip' => 'Male',
         ]);
-        $user = \App\Models\SubDealer::factory()->create([
+        $user = \App\Models\PreNSubDealer::factory()->create([
             'user_id'=>'2',
             'username'=>'subdealer',
-            'type'=>'sub',
-            'sub_dealer_type_id'=>1,
+            // 'type'=>'sub',
+            // 'sub_dealer_type_id'=>1,
             'first_name' => 'Mr Sub',
             'last_name'=>'Dealer',
             'email' => 'subdealer@mail.com',
