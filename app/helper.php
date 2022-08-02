@@ -2,8 +2,7 @@
 
 use App\Models\Admin;
 use App\Models\Dealer;
-use App\Models\PreDealer;
-use App\Models\SubDealer;
+use App\Models\PreNSubDealer;
 use App\Models\User;
 
 if (!function_exists('get_first_user_by_email')) {
@@ -16,7 +15,7 @@ if (!function_exists('get_first_user_by_email')) {
         if(Dealer::where('email',$email)->exists()){
             $user = Dealer::with('roles')->where('email',$email)->first();
         }
-        else if(SubDealer::where('email',$email)->exists()){
+        else if(PreNSubDealer::where('email',$email)->exists()){
             $user = SubDealer::with('roles')->where('email',$email)->first();
         }
         // else if(PreDealer::where('email',$email)->exists()){
