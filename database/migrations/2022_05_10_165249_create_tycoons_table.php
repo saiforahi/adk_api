@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('pre_n_sub_dealers', function (Blueprint $table) {
+        Schema::create('tycoons', function (Blueprint $table) {
             $table->id();
             $table->integer('placement_id')->nullable();
             $table->string('user_id')->unique();
@@ -56,6 +56,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pre_n_sub_dealers');
+        Schema::dropIfExists('tycoons');
     }
 };

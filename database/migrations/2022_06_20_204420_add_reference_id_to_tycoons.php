@@ -13,10 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('pre_n_sub_dealers', function (Blueprint $table) {
+        Schema::table('tycoons', function (Blueprint $table) {
             //
             $table->unsignedBigInteger('reference_id')->nullable();
-            $table->foreign('reference_id')->references('id')->on('pre_n_sub_dealers')->onDelete('cascade');
+            $table->foreign('reference_id')->references('id')->on('tycoons')->onDelete('cascade');
         });
     }
 
@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('pre_n_sub_dealers', function (Blueprint $table) {
+        Schema::table('tycoons', function (Blueprint $table) {
             //
             $table->dropForeign(['reference_id']);
             $table->dropColumn('reference_id');

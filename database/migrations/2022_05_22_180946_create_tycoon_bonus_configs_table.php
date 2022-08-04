@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('pre_dealer_bonus_configs', function (Blueprint $table) {
+        Schema::create('tycoon_bonus_configs', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
         });
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pre_dealer_bonus_configs');
+        Schema::dropIfExists('tycoon_bonus_configs');
     }
 };

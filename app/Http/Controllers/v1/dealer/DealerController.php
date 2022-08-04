@@ -6,10 +6,12 @@ use App\Events\v1\UploadImageEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DealerRequest;
 use App\Models\Dealer;
+use App\Models\DealerWallet;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use DB;
 
 class DealerController extends Controller
 {
@@ -23,7 +25,7 @@ class DealerController extends Controller
     public function _store(DealerRequest $req)
     {
         try{
-            $data=array('password'=>Hash::make($req->password), 'user_id'=>date('Y').date('m').date('d').Dealer::all()->count());
+            $data=array('password'=>Hash::make($req->password), 'current_balance'=>$req->opening_balance,'user_id'=>date('Y').date('m').date('d').Dealer::all()->count());
             $new_dealer = Dealer::create(array_merge($req->except('password'),$data));
             $images=array();
             if($req->hasFile('image') && $req->file('image')->isValid()){
@@ -77,7 +79,7 @@ class DealerController extends Controller
     public function _details(Dealer $dealer):JsonResponse
     {
         try{
-            return $this->success($dealer);
+            return $this->success(Dealer::with('roles')->with('wallet')->where('id',$dealer->id)->first());
         }
         catch(Exception $e){
             return $this->failed(null, $e->getMessage(), 500);
@@ -87,5 +89,36 @@ class DealerController extends Controller
     {
         $dealer->delete();
         return $this->success($dealer, 'Dealer Deleted Successfully');
+    }
+
+    public function _stock_product(Request $req){
+        try{
+            $req->validate([
+                'dealer_id'=>'required|exists:dealers,id',
+                'products'=> 'required|json'
+            ]);
+            dd(json_decode($req->products));
+        }
+        catch(Exception $e){
+
+        }
+    }
+
+    public function _update_product_balance(Request $req):JsonResponse
+    {
+        $req->validate([
+            'dealer_id'=>'required|exists:dealers,id',
+            'amount'=> 'required|numeric'
+        ]);
+        try{
+            DB::table('dealer_wallets')->updateOrInsert(
+                ['dealer_id' => $req->dealer_id],
+                ['product_balance' => $req->amount]
+            );
+            return $this->success(DealerWallet::with('dealer')->where('dealer_id',$req->dealer_id)->first(), 'Dealer wallet updated successfully');
+        }
+        catch(Exception $e){
+            return $this->failed(null, $e->getMessage(), 500);
+        }
     }
 }

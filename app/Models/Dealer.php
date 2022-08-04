@@ -48,4 +48,7 @@ class Dealer extends Authenticatable implements HasMedia,MustVerifyEmail
             ->acceptsMimeTypes(['image/jpeg','image/jpg','image/png','image/webp'])
             ->withResponsiveImages();
     }
+    public function wallet(){
+        return $this->hasOne(DealerWallet::class);
+    }
 }

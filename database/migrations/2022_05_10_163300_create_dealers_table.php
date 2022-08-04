@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('nominee_name')->nullable();
             $table->string('nid')->nullable();
             $table->double('opening_balance')->default(0.0);
+            $table->double('current_balance')->default(0.0);
             $table->string('nominee_phone')->nullable();
             $table->string('nominee_nid')->nullable();
             $table->mediumText('address')->nullable();

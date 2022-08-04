@@ -5,9 +5,9 @@ namespace App\Http\Controllers\v1\pre_n_sub;
 use App\Events\v1\UploadImageEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PreSubDealerRequest;
-use App\Models\PreDealer;
-use App\Models\SubDealer;
+use App\Models\Tycoon;
 use App\Models\SubDealerTypes;
+use App\Models\TycoonTypes;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,8 +24,8 @@ class PreSubController extends Controller
     public function create_sub_dealer(PreSubDealerRequest $req){
         try{
             
-            $data=array('password'=>Hash::make($req->password), 'user_id'=>date('Y').date('m').date('d').SubDealer::all()->count());
-            $new_sub_dealer = SubDealer::create(array_merge($req->except('password'),$data));
+            $data=array('password'=>Hash::make($req->password), 'user_id'=>date('Y').date('m').date('d').Tycoon::all()->count());
+            $new_sub_dealer = Tycoon::create(array_merge($req->except('password'),$data));
             return $new_sub_dealer;
         }
         catch(Exception $e){
@@ -35,8 +35,8 @@ class PreSubController extends Controller
     public function create_pre_dealer(PreSubDealerRequest $req){
         try{
             // dd('working');
-            $data=array('password'=>Hash::make($req->password), 'user_id'=>date('Y').date('m').date('d').PreDealer::all()->count());
-            $new_pre_dealer = PreDealer::create(array_merge($req->except('password'),$data));
+            $data=array('password'=>Hash::make($req->password), 'user_id'=>date('Y').date('m').date('d').Tycoon::all()->count());
+            $new_pre_dealer = Tycoon::create(array_merge($req->except('password'),$data));
             return $new_pre_dealer;
         }
         catch(Exception $e){
@@ -45,7 +45,7 @@ class PreSubController extends Controller
     }
     public function _all_sub_dealer_types(){
         try{
-            return $this->success(SubDealerTypes::all());
+            return $this->success(TycoonTypes::all());
         }
         catch(Exception $e){
             return $this->failed(null, $e->getMessage(), 500);
@@ -57,8 +57,8 @@ class PreSubController extends Controller
             $new_pre_or_sub_dealer='';
            
      
-            $data=array('password'=>Hash::make($req->password), 'user_id'=>date('Y').date('m').date('d').PreDealer::all()->count());
-            $new_pre_or_sub_dealer = PreDealer::create(array_merge($req->except('password'),$data));
+            $data=array('password'=>Hash::make($req->password), 'user_id'=>date('Y').date('m').date('d').Tycoon::all()->count());
+            $new_pre_or_sub_dealer = Tycoon::create(array_merge($req->except('password'),$data));
           
             $images=array();
             if($req->hasFile('image') && $req->file('image')->isValid()){
@@ -83,7 +83,7 @@ class PreSubController extends Controller
     public function _all():JsonResponse
     {
         try{
-            return $this->success(PreDealer::select('pre_n_sub_dealers.*', DB::raw('CONCAT(pre_n_sub_dealers.first_name, " ", pre_n_sub_dealers.last_name) AS name'
+            return $this->success(Tycoon::select('tycoons.*', DB::raw('CONCAT(tycoons.first_name, " ", tycoons.last_name) AS name'
             ))->get());
         }
         catch(Exception $e){
@@ -96,7 +96,7 @@ class PreSubController extends Controller
     public function _update($pre_or_sub_dealer_id,PreSubDealerRequest $req):JsonResponse
     {
         try{
-            $pre_or_sub_dealer=PreDealer::find($pre_or_sub_dealer_id);
+            $pre_or_sub_dealer=Tycoon::find($pre_or_sub_dealer_id);
             
             $data = [];
             if ($req->password) {
@@ -112,7 +112,7 @@ class PreSubController extends Controller
 
 
     //show specific suppler details
-    public function _details(PreDealer $dealer):JsonResponse
+    public function _details(Tycoon $dealer):JsonResponse
     {
         try{
             return $this->success($dealer);
@@ -121,7 +121,7 @@ class PreSubController extends Controller
             return $this->failed(null, $e->getMessage(), 500);
         }
     }
-    public function _delete(PreDealer $dealer): JsonResponse
+    public function _delete(Tycoon $dealer): JsonResponse
     {
         $dealer->delete();
         return $this->success($dealer, 'Dealer Deleted Successfully');

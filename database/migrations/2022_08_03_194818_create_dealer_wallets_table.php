@@ -13,10 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('sub_dealer_groups', function (Blueprint $table) {
+        Schema::create('dealer_wallets', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('sub_dealer_id');
-            $table->foreign('sub_dealer_id')->references('id')->on('pre_n_sub_dealers');
+            $table->unsignedBigInteger('dealer_id')->unique();
+            $table->float('product_balance', $precision = 19, $scale = 2);
+            $table->foreign('dealer_id')->references('id')->on('dealers');
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('sub_dealer_groups');
+        Schema::dropIfExists('dealer_wallets');
     }
 };

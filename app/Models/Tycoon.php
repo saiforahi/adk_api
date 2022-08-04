@@ -13,10 +13,10 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class PreNSubDealer extends Authenticatable implements HasMedia,MustVerifyEmail
+class Tycoon extends Authenticatable implements HasMedia,MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable,InteractsWithMedia,HasRoles,SoftDeletes;
-    protected $table="pre_n_sub_dealers";
+    protected $table="tycoons";
     protected $guarded=[];
     protected $guard="pre_n_sub_dealers";
 

@@ -6,7 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
-class SubPreSeeder extends Seeder
+class TycoonSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,7 +15,7 @@ class SubPreSeeder extends Seeder
      */
     public function run()
     {
-        $user = \App\Models\PreNSubDealer::factory()->create([
+        $user = \App\Models\Tycoon::factory()->create([
             'user_id'=>'1',
             'username'=>'predealer',
             // 'type'=>'pre',
@@ -27,7 +27,7 @@ class SubPreSeeder extends Seeder
             'opening_balance'=>1500
             //'last_login_ip' => 'Male',
         ]);
-        $user = \App\Models\PreNSubDealer::factory()->create([
+        $user = \App\Models\Tycoon::factory()->create([
             'user_id'=>'2',
             'username'=>'subdealer',
             // 'type'=>'sub',
