@@ -6,20 +6,22 @@ use App\Events\v1\UploadImageEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DealerRequest;
 use App\Models\Dealer;
+use App\Models\DealerProduct;
 use App\Models\DealerWallet;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use DB;
+use Auth;
 
 class DealerController extends Controller
 {
     //
     public function __construct()
     {
-        $this->middleware(['auth:admin'])->except([]);
-        // $this->middleware('role:super-admin|unit-admin')->except([]);
+        $this->middleware(['auth:admin'])->except(['_stock_product']);
+        
     }
 
     public function _store(DealerRequest $req)
@@ -91,16 +93,24 @@ class DealerController extends Controller
         return $this->success($dealer, 'Dealer Deleted Successfully');
     }
 
-    public function _stock_product(Request $req){
+    public function _stock_product(Request $req):JsonResponse
+    {
         try{
             $req->validate([
                 'dealer_id'=>'required|exists:dealers,id',
-                'products'=> 'required|json'
+                'products'=> 'required'
             ]);
-            dd(json_decode($req->products));
+            foreach($req->products as $product){
+                DealerProduct::create([
+                    'dealer_id'=>$req->dealer_id,
+                    'product_id'=> $product['product_id'],
+                    'qty'=> $product['qty'],
+                ]);
+            }
+            return $this->success($req->all());
         }
         catch(Exception $e){
-
+            return $this->failed(null, $e->getMessage(), 500);
         }
     }
 

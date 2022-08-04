@@ -49,14 +49,9 @@ return [
             'provider' => 'dealers',
         ],
 
-        'subdealer' => [
+        'tycoon' => [
             'driver' => 'sanctum',
-            'provider' => 'pre_n_sub_dealers',
-            'hash' => false,
-        ],
-        'predealer' => [
-            'driver' => 'sanctum',
-            'provider' => 'pre_n_sub_dealers',
+            'provider' => 'tycoons',
             'hash' => false,
         ],
         'staff' => [
@@ -96,13 +91,9 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Dealer::class,
         ],
-        'sub_dealers' => [
+        'tycoons' => [
             'driver' => 'eloquent',
-            'model' => App\Models\SubDealer::class,
-        ],
-        'pre_dealers' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\PreDealer::class,
+            'model' => App\Models\Tycoon::class,
         ],
         'staff' => [
             'driver' => 'eloquent',
@@ -149,14 +140,8 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
-        'sub_dealers' => [
-            'provider' => 'pre_n_sub_dealers',
-            'table' => 'password_resets',
-            'expire' => 60,
-            'throttle' => 60,
-        ],
-        'pre_dealers' => [
-            'provider' => 'pre_n_sub_dealers',
+        'tycoons' => [
+            'provider' => 'tycoons',
             'table' => 'password_resets',
             'expire' => 60,
             'throttle' => 60,

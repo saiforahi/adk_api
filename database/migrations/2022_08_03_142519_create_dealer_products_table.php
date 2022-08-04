@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('dealer_id');
             $table->unsignedBigInteger('product_id');
             $table->integer('qty')->comment('product quantity');
-            $table->unsignedBigInteger('warehouse');
+            $table->unsignedBigInteger('warehouse')->nullable();
             $table->timestamps();
 
             $table->foreign('dealer_id')->references('id')->on('dealers')->onDelete('cascade');
