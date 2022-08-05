@@ -13,10 +13,10 @@ if (!function_exists('get_first_user_by_email')) {
             $user = Admin::with('roles')->where('email',$email)->first();
         }
         if(Dealer::where('email',$email)->exists()){
-            $user = Dealer::with('roles')->where('email',$email)->first();
+            $user = Dealer::with('roles')->with('wallet')->where('email',$email)->first();
         }
         else if(Tycoon::where('email',$email)->exists()){
-            $user = SubDealer::with('roles')->where('email',$email)->first();
+            $user = Tycoon::with('roles')->where('email',$email)->first();
         }
         // else if(PreDealer::where('email',$email)->exists()){
         //     $user = PreDealer::where('email',$email)->first();

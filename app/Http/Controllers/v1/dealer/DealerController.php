@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use DB;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class DealerController extends Controller
 {
@@ -101,24 +101,33 @@ class DealerController extends Controller
                 // 'dealer_id'=>'required|exists:dealers,id',
                 'products'=> 'required'
             ]);
-            $new_order = DealerOrderDetail::create([
-                'dealer_id'=>Auth::user()->id,
-                'cus_first_name'=> $req->first_name,
-                'cus_last_name'=> $req->last_name,
-                'cus_email'=> $req->email,
-                'cus_phone'=> $req->phone,
-                'cus_address' => $req->delivery_address,
-                'total_amount' => $req->totalAmount,
-                'order_notes'=> $req->order_notes
-            ]);
-            foreach($req->products as $product){
-                DealerProduct::create([
-                    'order_id'=>$new_order['id'],
-                    'product_id'=> $product['product_id'],
-                    'qty'=> $product['quantity'],
+            if(Auth::user()->wallet->product_balance > (float)$req->totalAmount){
+                $new_order = DealerOrderDetail::create([
+                    'dealer_id'=>Auth::user()->id,
+                    'cus_first_name'=> $req->first_name,
+                    'cus_last_name'=> $req->last_name,
+                    'cus_email'=> $req->email,
+                    'cus_phone'=> $req->phone,
+                    'cus_address' => $req->delivery_address,
+                    'total_amount' => $req->totalAmount,
+                    'order_notes'=> $req->order_notes
                 ]);
+                foreach($req->products as $product){
+                    DealerProduct::create([
+                        'order_id'=>$new_order['id'],
+                        'product_id'=> $product['product_id'],
+                        'qty'=> $product['quantity'],
+                    ]);
+                }
+                DealerWallet::where('dealer_id',Auth::user()->id)->update([
+                    'product_balance'=> Auth::user()->wallet->product_balance-(float)$req->totalAmount
+                ]);
+                return $this->success($req->all());
             }
-            return $this->success($req->all());
+            else{
+                return $this->failed(null,'Insuficient product balance');
+            }
+            
         }
         catch(Exception $e){
             return $this->failed(null, $e->getMessage(), 500);
