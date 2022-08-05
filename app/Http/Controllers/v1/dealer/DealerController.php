@@ -6,6 +6,7 @@ use App\Events\v1\UploadImageEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DealerRequest;
 use App\Models\Dealer;
+use App\Models\DealerOrderDetail;
 use App\Models\DealerProduct;
 use App\Models\DealerWallet;
 use Exception;
@@ -97,14 +98,24 @@ class DealerController extends Controller
     {
         try{
             $req->validate([
-                'dealer_id'=>'required|exists:dealers,id',
+                // 'dealer_id'=>'required|exists:dealers,id',
                 'products'=> 'required'
+            ]);
+            $new_order = DealerOrderDetail::create([
+                'dealer_id'=>Auth::user()->id,
+                'cus_first_name'=> $req->first_name,
+                'cus_last_name'=> $req->last_name,
+                'cus_email'=> $req->email,
+                'cus_phone'=> $req->phone,
+                'cus_address' => $req->delivery_address,
+                'total_amount' => $req->totalAmount,
+                'order_notes'=> $req->order_notes
             ]);
             foreach($req->products as $product){
                 DealerProduct::create([
-                    'dealer_id'=>$req->dealer_id,
+                    'order_id'=>$new_order['id'],
                     'product_id'=> $product['product_id'],
-                    'qty'=> $product['qty'],
+                    'qty'=> $product['quantity'],
                 ]);
             }
             return $this->success($req->all());
