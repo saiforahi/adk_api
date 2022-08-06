@@ -6,22 +6,23 @@ use App\Events\v1\UploadImageEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DealerRequest;
 use App\Models\Dealer;
-use App\Models\DealerOrderDetail;
 use App\Models\DealerProduct;
+use App\Models\DealerProductStock;
 use App\Models\DealerWallet;
+use App\Models\ProductStockOrder;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
-use DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DealerController extends Controller
 {
     //
     public function __construct()
     {
-        $this->middleware(['auth:admin'])->except(['_stock_product']);
+        $this->middleware(['auth:admin'])->except(['_product_stock_order']);
         
     }
 
@@ -94,30 +95,24 @@ class DealerController extends Controller
         return $this->success($dealer, 'Dealer Deleted Successfully');
     }
 
-    public function _stock_product(Request $req):JsonResponse
+    public function _product_stock_order(Request $req):JsonResponse
     {
         try{
             $req->validate([
                 // 'dealer_id'=>'required|exists:dealers,id',
                 'products'=> 'required'
             ]);
-            if(Auth::user()->wallet->product_balance > (float)$req->totalAmount){
-                $new_order = DealerOrderDetail::create([
-                    'dealer_id'=>Auth::user()->id,
-                    'cus_first_name'=> $req->first_name,
-                    'cus_last_name'=> $req->last_name,
-                    'cus_email'=> $req->email,
-                    'cus_phone'=> $req->phone,
-                    'cus_address' => $req->delivery_address,
-                    'total_amount' => $req->totalAmount,
-                    'order_notes'=> $req->order_notes
-                ]);
+            if(Auth::user()->wallet && Auth::user()->wallet->product_balance > (float)$req->totalAmount){
                 foreach($req->products as $product){
-                    DealerProduct::create([
-                        'order_id'=>$new_order['id'],
-                        'product_id'=> $product['product_id'],
+                    $new_order = ProductStockOrder::create([
+                        'order_id'=>"1",
+                        'product_id'=>$product['product_id'],
                         'qty'=> $product['quantity'],
+                        'order_notes'=> 'null'
                     ]);
+                    $new_order->order_from()->associate(Auth::user());
+                    // $new_order->order_to()->associate();
+                    $new_order->save();
                 }
                 DealerWallet::where('dealer_id',Auth::user()->id)->update([
                     'product_balance'=> Auth::user()->wallet->product_balance-(float)$req->totalAmount

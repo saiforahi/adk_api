@@ -16,4 +16,5 @@ Route::post('/products/{product}', [ProductController::class, 'update']);
 Route::resource('/products', ProductController::class);
 Route::post('/product-stocks/{product}', [ProductStockController::class, 'update']);
 Route::resource('/product-stocks', ProductStockController::class);
-
+Route::get('/stock-orders-history', [ProductStockController::class,'product_stock_orders'])->middleware('auth:dealer');
+Route::get('/stock-order/update-status', [ProductStockController::class,'product_stock_order_status_update'])->middleware('auth:dealer');

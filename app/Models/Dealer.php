@@ -20,6 +20,7 @@ class Dealer extends Authenticatable implements HasMedia,MustVerifyEmail
     protected $table='dealers';
     protected $guarded=[];
     protected $hidden=['password','remember_token'];
+    // protected $with = ['wallet','guard__name'];
     protected $casts = [
         'email_verified_at' => 'datetime:Y-m-d h:i:s A',
         'created_at'=>'datetime:Y-m-d h:i:s A',
@@ -29,6 +30,13 @@ class Dealer extends Authenticatable implements HasMedia,MustVerifyEmail
     // returning guard name
     public function guard__name(){
         return $this->guard_name;
+    }
+    // polymorphic relation to product stock order table
+    public function product_stock_orders(){
+        return $this->morphMany(ProductStockOrder::class, 'order_from');
+    }
+    public function product_stock_orders_to_me(){
+        return $this->morphMany(ProductStockOrder::class, 'order_to');
     }
     // media functions
     public function registerMediaConversions(Media $media = null): void

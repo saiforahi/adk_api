@@ -44,6 +44,10 @@ class RoleAndPermissionsSeeder extends Seeder
             'user_id'=>'20221606100'
             //'gender' => 'Male',
         ]);
+        $wallet= \App\Models\DealerWallet::create([
+            'dealer_id'=> $user['id'],
+            'product_balance'=>0.0
+        ]);
         // $user->assignRole($role2);
     }
 }
