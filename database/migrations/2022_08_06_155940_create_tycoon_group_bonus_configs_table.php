@@ -13,14 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('dealer_commissions', function (Blueprint $table) {
+        Schema::create('tycoon_group_bonus_configs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('dealer_type_id')->nullable();
-            $table->double('capital');
-            $table->double('product');
-            $table->double('commission')->nullable();
+            $table->string('group_no');
+            $table->double('bonus_percentage')->nullable();
             $table->timestamps();
-            $table->foreign('dealer_type_id')->references('id')->on('dealer_types');
         });
     }
 
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('dealer_commissions');
+        Schema::dropIfExists('tycoon_group_bonus_configs');
     }
 };

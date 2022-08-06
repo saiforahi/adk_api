@@ -28,5 +28,14 @@ class DatabaseSeeder extends Seeder
         Product::factory(5)->create();
         $this->call(RoleAndPermissionsSeeder::class);
         $this->call(TycoonSeeder::class);
+        $this->call(CountrySeeder::class);
+        $this->call(DivisionSeeder::class);
+        $this->call(DistrictSeeder::class);
+        $this->call(ThanaSeeder::class);
+        $this->call(UnionSeeder::class);
+        $this->call(DealerBonusConfigSeeder::class);
+        $this->call(TycoonBonusConfigSeeder::class);
+        $this->call(TycoonGroupBonusConfigSeeder::class);
+        $this->call(TycoonStarMonthlyBonusConfigSeeder::class);
     }
 }

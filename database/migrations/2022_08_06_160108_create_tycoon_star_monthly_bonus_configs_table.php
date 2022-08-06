@@ -13,9 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('tycoon_bonus_configs', function (Blueprint $table) {
+        Schema::create('tycoon_star_monthly_bonus_configs', function (Blueprint $table) {
             $table->id();
-            $table->string('bonus_type');
+            $table->string('star_no');
             $table->double('bonus_percentage')->nullable();
             $table->timestamps();
         });
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tycoon_bonus_configs');
+        Schema::dropIfExists('tycoon_star_monthly_bonus_configs');
     }
 };

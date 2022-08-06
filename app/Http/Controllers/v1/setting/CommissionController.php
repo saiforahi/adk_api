@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\v1\setting;
 
 use App\Http\Controllers\Controller;
-use App\Models\DealerCommission;
-use App\Models\TycoonCommission;
+use App\Models\DealerBonusConfig;
+use App\Models\TycoonGroupBonusConfig;
+use App\Models\TycoonStarMonthlyBonusConfig;
+use App\Models\TycoonBonusConfig;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -26,8 +28,10 @@ class CommissionController extends Controller
         try{
 
             $data = [];
-            $data ['dealer'] = DealerCommission::leftJoin('dealer_types', 'dealer_commissions.dealer_type_id', 'dealer_types.id')->select('dealer_commissions.*', 'dealer_types.name as type_name')->get();
-            $data ['tycoon'] = TycoonCommission::first();
+            $data ['dealer_bonus'] = DealerBonusConfig::leftJoin('dealer_types', 'dealer_bonus_configs.dealer_type_id', 'dealer_types.id')->select('dealer_bonus_configs.*', 'dealer_types.name as type_name')->get();
+            $data ['tycoon_bonus'] = TycoonBonusConfig::get();
+            $data ['tycoon_group_bonus'] = TycoonGroupBonusConfig::get();
+            $data ['tycoon_star_monthly_bonus'] = TycoonStarMonthlyBonusConfig::get();
 
             return $this->success($data);
         }
@@ -37,14 +41,14 @@ class CommissionController extends Controller
     }
 
     // update supplier details
-    public function _update(DealerCommission $dealerCommission,DealerCommissionRequest $req):JsonResponse
+    public function _update(DealerCommission $dealerCommission, DealerCommissionRequest $req):JsonResponse
     {
         try{
             $data = [];
             if ($req->password) {
                 $data=array('password'=>Hash::make($req->password));
             }
-            $dealerCommission->update(array_merge($req->except('password'),$data));
+            $dealerCommission->update(array_merge($req, $data));
             return $this->success($dealerCommission);
         }
         catch(Exception $e){

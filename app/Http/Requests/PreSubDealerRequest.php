@@ -26,8 +26,8 @@ class PreSubDealerRequest extends FormRequest
     {
         return [
             //
-            'reference_id'=>'required|string|max:255|exists:pre_n_sub_dealers,id',
-            'placement_id'=>'required|string|max:255|exists:pre_n_sub_dealers,user_id',
+            'reference_id'=>'required|string|max:255|exists:tycoons,id',
+            'placement_id'=>'required|string|max:255|exists:tycoons,user_id',
             'opening_balance'=>'required|numeric',
             'username'=>'required|string|max:255|unique:,username',
 
@@ -35,7 +35,7 @@ class PreSubDealerRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('pre_n_sub_dealers')
+                Rule::unique('tycoons')
                     ->ignore($this->dealer)
             ],
 
@@ -45,7 +45,7 @@ class PreSubDealerRequest extends FormRequest
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('pre_n_sub_dealers')
+                Rule::unique('tycoons')
                     ->ignore($this->dealer)
             ],
             'phone' => [
@@ -53,7 +53,7 @@ class PreSubDealerRequest extends FormRequest
                 'string',
                 'max:20',
                 'min:9',
-                Rule::unique('pre_n_sub_dealers')
+                Rule::unique('tycoons')
                     ->ignore($this->dealer)
             ],
             'address'=>'sometimes|nullable|string',

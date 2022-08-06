@@ -15,7 +15,12 @@ return new class extends Migration
     {
         Schema::create('dealer_bonus_configs', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('dealer_type_id')->nullable();
+            $table->double('capital');
+            $table->double('product');
+            $table->double('commission')->nullable();
             $table->timestamps();
+            $table->foreign('dealer_type_id')->references('id')->on('dealer_types');
         });
     }
 
