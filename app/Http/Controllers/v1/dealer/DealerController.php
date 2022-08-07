@@ -5,6 +5,7 @@ namespace App\Http\Controllers\v1\dealer;
 use App\Events\v1\UploadImageEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DealerRequest;
+use App\Models\Admin;
 use App\Models\Dealer;
 use App\Models\DealerProduct;
 use App\Models\DealerProductStock;
@@ -22,7 +23,7 @@ class DealerController extends Controller
     //
     public function __construct()
     {
-        $this->middleware(['auth:admin'])->except(['_product_stock_order']);
+        $this->middleware(['auth:admin'])->except(['_product_stock_order','product_stocks']);
         
     }
 
@@ -111,6 +112,7 @@ class DealerController extends Controller
                         'order_notes'=> 'null'
                     ]);
                     $new_order->order_from()->associate(Auth::user());
+                    $new_order->order_to()->associate(Admin::first());
                     // $new_order->order_to()->associate();
                     $new_order->save();
                 }
@@ -143,6 +145,17 @@ class DealerController extends Controller
             return $this->success(DealerWallet::with('dealer')->where('dealer_id',$req->dealer_id)->first(), 'Dealer wallet updated successfully');
         }
         catch(Exception $e){
+            return $this->failed(null, $e->getMessage(), 500);
+        }
+    }
+
+    public function product_stocks(){
+        try{
+            $stocks=DealerProductStock::where('dealer_id',Auth::user()->id)->get();
+            return $this->success($stocks, 'Dealer Product stock list',200);
+
+        }
+        catch (Exception $e){
             return $this->failed(null, $e->getMessage(), 500);
         }
     }

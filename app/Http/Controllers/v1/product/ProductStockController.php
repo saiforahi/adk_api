@@ -5,6 +5,7 @@ namespace App\Http\Controllers\v1\product;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductStockRequest;
 use App\Models\Dealer;
+use App\Models\DealerProductStock;
 use App\Models\ProductStock;
 use App\Models\ProductStockOrder;
 use Exception;
@@ -73,43 +74,62 @@ class ProductStockController extends Controller
     public function destroy(ProductStock $productStock): JsonResponse
     {
         $productStock->delete();
-        return $this->success($productStock, 'Product Stock Deleted Successfully');
+        return $this->success($productStock, 'Product Stock Deleted Successfully',200);
+    }
+    
+    // order list or requests for dealers 
+    public function product_stock_orders($type): JsonResponse
+    {
+        try{
+            $orders=array();
+            switch($type){
+                case 'history':
+                    $orders = ProductStockOrder::with(['product','order_to','order_from'])->whereHasMorph('order_from',Dealer::class,function(Builder $query){
+                        $query->where('id', '=', Auth::user()->id);
+                    })->get();
+                    break;
+                
+                case 'requests':
+                    $orders = ProductStockOrder::with(['product','order_to','order_from'])->whereHasMorph('order_to',Dealer::class,function(Builder $query){
+                        $query->where('id', '=', Auth::user()->id);
+                    })->get();
+                    break;
+            }
+            
+            return $this->success($orders, 'Product Stock orders',200);
+        }
+        catch(Exception $e){
+            return $this->failed(null, $e->getMessage(), 500);
+        }
+    }
+    public function product_stock_order_status_update(Request $req): JsonResponse
+    {
+        try{
+            $req->validate([
+                'order_id'=>'required',
+                'status'=> 'required'
+            ]);
+            $order=ProductStockOrder::findOrFail($req->order_id);
+            $order->status=$req->status;
+            $order->save();
+            
+            switch($req->status){
+                case 'PROCESSED':
+                    $dealer_stock=DealerProductStock::create([
+                        'product_id'=> $order->product_id,
+                        'dealer_id'=> $order->order_from->id,
+                        'fk_order_id'=> $order->order_id,
+                        'qty'=> $order->qty
+                    ]);
+                    break;
+            }
+            
+            return $this->success($order, 'Product Stock order status updated',200);
+        }
+        catch(Exception $e){
+            return $this->failed(null, $e->getMessage(), 500);
+        }
     }
 
-    public function product_stock_orders(): JsonResponse
-    {
-        try{
-            $orders = ProductStockOrder::with(['product','order_from' => function (MorphTo $morphTo) {
-                $morphTo->constrain([
-                    Dealer::class => function (Builder $query) {
-                        $query->where('id', '=', Auth::user()->id);
-                    },
-                ]);
-            }])->whereHasMorph('order_from',Dealer::class,function(Builder $query){
-                $query->where('id', '=', Auth::user()->id);
-            })->get();
-            return $this->success($orders, 'Product Stock orders');
-        }
-        catch(Exception $e){
-            return $this->failed(null, $e->getMessage(), 500);
-        }
-    }
-    public function product_stock_order_status_update(): JsonResponse
-    {
-        try{
-            $orders = ProductStockOrder::with(['product','order_from' => function (MorphTo $morphTo) {
-                $morphTo->constrain([
-                    Dealer::class => function (Builder $query) {
-                        $query->where('id', '=', Auth::user()->id);
-                    },
-                ]);
-            }])->whereHasMorph('order_from',Dealer::class,function(Builder $query){
-                $query->where('id', '=', Auth::user()->id);
-            })->get();
-            return $this->success($orders, 'Product Stock orders');
-        }
-        catch(Exception $e){
-            return $this->failed(null, $e->getMessage(), 500);
-        }
-    }
+    
 }

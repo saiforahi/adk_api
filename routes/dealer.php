@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\v1\dealer\DealerController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\v1\product\ProductStockController;
 
 Route::post('create', [DealerController::class, '_store']);
 Route::get('all', [DealerController::class,'_all']);
@@ -10,3 +11,15 @@ Route::get('details/{dealer}', [DealerController::class,'_details']);
 Route::delete('delete/{dealer}',[DealerController::class,'_delete']);
 Route::put('product/stock',[DealerController::class,'_product_stock_order'])->middleware('auth:dealer');
 Route::put('wallet/update/product-balance',[DealerController::class,'_update_product_balance']);
+
+
+Route::middleware('auth:dealer')->group(function () {
+    Route::group(['prefix' => 'product'], function () {
+        Route::get('/stock', [DealerController::class,'product_stocks']);
+        Route::get('/stock-orders/{type}', [ProductStockController::class,'product_stock_orders']);
+        Route::post('/stock-orders/update-status', [ProductStockController::class,'product_stock_order_status_update']);
+        Route::group(['prefix' => 'courier-app'], function () {
+            
+        });
+    });
+});
