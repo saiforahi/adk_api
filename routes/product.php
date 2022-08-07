@@ -7,13 +7,13 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::post('/product-groups/{product_group}', [ProductGroupController::class, 'update']);
-Route::resource('/product-groups', ProductGroupController::class);
+Route::resource('/groups', ProductGroupController::class);
 
 /**
  * Product & Product stocks Routes
  */
 Route::post('/products/{product}', [ProductController::class, 'update']);
-Route::resource('/products', ProductController::class);
+Route::resource('/list', ProductController::class);
 Route::post('/product-stocks/{product}', [ProductStockController::class, 'update']);
 Route::resource('/product-stocks', ProductStockController::class);
 Route::get('/stock-orders-history', [ProductStockController::class,'product_stock_orders'])->middleware('auth:dealer');
