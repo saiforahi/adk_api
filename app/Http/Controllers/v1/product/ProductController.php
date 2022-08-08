@@ -118,4 +118,8 @@ class ProductController extends Controller
         $product->makeHidden('media');
         return $product;
     }
+
+    public function all_stocked_products(){
+        
+    }
 }
