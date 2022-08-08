@@ -18,5 +18,6 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:admin'])->group(function () {
     Route::group(['prefix' => 'product'], function () {
         Route::get('stock-orders/requests', [ProductStockOrderController::class, 'product_stock_orders']);
+        Route::post('/stock-orders/update-status', [ProductStockOrderController::class,'product_stock_order_status_update']);
     });
 });

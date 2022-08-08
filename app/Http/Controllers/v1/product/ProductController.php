@@ -119,7 +119,7 @@ class ProductController extends Controller
         return $product;
     }
 
-    public function all_stocked_products(){
-        
+    public function all_stockable_products(){
+
     }
 }
