@@ -112,25 +112,25 @@ class CategoryController extends Controller
 
     protected function uploadImage(Request $request, $category): void
     {
-        $icons = $category->getMedia('icon');
-        $banners = $category->getMedia('banner');
-        if ($icons) {
-            $icons->each(function ($item) {
-                $item->delete();
-            });
-        }
-        if ($banners) {
-            $banners->each(function ($item) {
-                $item->delete();
-            });
-        }
         $icons = [];
         $banners = [];
         if ($request->hasFile('icon') && $request->file('icon')->isValid()) {
+            $get_icons = $category->getMedia('icon');
+            if ($get_icons) {
+                $get_icons->each(function ($item) {
+                    $item->delete();
+                });
+            }
             $icons[] = $request->file('icon');
             event(new UploadImageEvent($category, $icons, 'icon'));
         }
         if ($request->hasFile('banner') && $request->file('banner')->isValid()) {
+            $get_banners = $category->getMedia('banner');
+            if ($get_banners) {
+                $get_banners->each(function ($item) {
+                    $item->delete();
+                });
+            }
             $banners[] = $request->file('banner');
             event(new UploadImageEvent($category, $banners, 'banner'));
         }
