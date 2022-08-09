@@ -29,7 +29,7 @@ class WarehouseController extends Controller
      * @param WarehouseRequest $request
      * @return JsonResponse
      */
-    public function store(WarehouseRequest $request): JsonResponse
+    public function store(WarehouseRequest $request)
     {
         try {
             $warehouse = Warehouse::query()->create(Arr::except($request->validated(), 'image'));
