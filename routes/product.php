@@ -13,6 +13,6 @@ Route::resource('/groups', ProductGroupController::class);
  * Product & Product stocks Routes
  */
 Route::post('/products/{product}', [ProductController::class, 'update']);
-Route::resource('/list', ProductController::class);
+Route::resource('/products', ProductController::class);
 Route::post('/product-stocks/{product}', [ProductStockController::class, 'update']);
 Route::resource('/product-stocks', ProductStockController::class);

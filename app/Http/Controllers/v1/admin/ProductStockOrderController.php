@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1\admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\v1\product\ProductStockController;
 use App\Models\Admin;
 use App\Models\DealerProductStock;
 use App\Models\ProductStockOrder;
@@ -36,6 +37,9 @@ class ProductStockOrderController extends Controller
     public function product_stock_order_status_update(Request $req): JsonResponse
     {
         try{
+            // return redirect()->action(
+            //     [ProductStockController::class, 'product_stock_order_status_update'], [$req->all()]
+            // );
             $req->validate([
                 'order_id'=>'required',
                 'status'=> 'required'
