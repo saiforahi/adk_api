@@ -74,6 +74,7 @@ class CategoryController extends Controller
             $data = Arr::except($request->validated(), ['icon', 'banner']);
             $data['slug'] = Str::slug($data['name']);
             $category->update($data);
+            
             $this->uploadImage($request, $category);
             return $this->success($category);
         } catch (\Exception $exception) {

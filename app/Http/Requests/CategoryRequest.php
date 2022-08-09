@@ -32,13 +32,8 @@ class CategoryRequest extends FormRequest
                     ->ignore($this->category)
                     ->whereNull('deleted_at')
             ],
-            'meta_title' => 'nullable',
-            'meta_description' => 'nullable',
             'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
             'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
-            'featured' => 'nullable|boolean',
-            'digital' => 'nullable|boolean',
-            'commission_rate' => 'nullable'
         ];
     }
 }

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\v1\purchaseOrder;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PurchaseOrderRequest;
 use App\Models\PurchaseOrder;
-use App\Models\ProductStock;
+use App\Models\AdminStock;
 use App\Models\PurchaseOrderDetail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -39,19 +39,15 @@ class PurchaseOrderController extends Controller
             $purchaseOrder->details()->createMany($request->details);
             // update or create stock
             foreach ($request->details as $item) {
-                $oldStock = ProductStock::where('product_id', $item['product_id'])->first();
+                $oldStock = AdminStock::where('product_id', $item['product_id'])->first();
                 if ($oldStock) {
                     $oldStock->update([
                         'product_id' => $item['product_id'],
-                        'price' => $item['cost'],
                         'quantity' => $item['req_quantity'] + $oldStock->quantity
                         ]);
                 } else {
-                    ProductStock::create([
+                    AdminStock::create([
                         'product_id' => $item['product_id'],  
-                        'variant' => '',
-                        'sku' => '',
-                        'price' => $item['cost'],
                         'quantity' => $item['req_quantity'],
                         ]);
                 }
@@ -89,7 +85,7 @@ class PurchaseOrderController extends Controller
             $purchaseOrder->details()->createMany($request->details);
             // update or create stock
             foreach ($request->details as $item) {
-                $oldStock = ProductStock::where('product_id', $item['product_id'])->first();
+                $oldStock = AdminStock::where('product_id', $item['product_id'])->first();
                 if ($oldStock) {
                     $oldStock->update([
                         'product_id' => $item['product_id'],
@@ -97,7 +93,7 @@ class PurchaseOrderController extends Controller
                         'quantity' => $item['req_quantity'] + $oldStock->quantity
                         ]);
                 } else {
-                    ProductStock::create([
+                    AdminStock::create([
                         'product_id' => $item['product_id'],  
                         'variant' => '',
                         'sku' => '',
@@ -106,10 +102,11 @@ class PurchaseOrderController extends Controller
                         ]);
                 }
             }
-
             DB::commit();
+
             return $this->success($purchaseOrder);
         } catch (\Exception $exception) {
+
             DB::rollback();
             return $this->failed(null, $exception->getMessage(), 500);
         }
@@ -122,7 +119,7 @@ class PurchaseOrderController extends Controller
     public function destroy(PurchaseOrder $purchaseOrder): JsonResponse
     {
         $purchaseOrder->delete();
-        return $this->success($purchaseOrder, 'PurchaseOrder Deleted Successfully');
+        return $this->success($purchaseOrder, 'Purchase Order Deleted Successfully');
     }
 
     /**
