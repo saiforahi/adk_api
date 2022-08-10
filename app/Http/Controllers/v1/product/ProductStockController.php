@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductStockRequest;
 use App\Models\Dealer;
 use App\Models\DealerProductStock;
-use App\Models\ProductStock;
+use App\Models\AdminStock;
 use App\Models\ProductStockOrder;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder;
@@ -23,8 +23,8 @@ class ProductStockController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $stocks = ProductStock::leftJoin('products', 'product_stocks.product_id', 'products.id')
-        ->select('product_stocks.*', 'products.name as product_name')
+        $stocks = AdminStock::leftJoin('products', 'admin_stocks.product_id', 'products.id')
+        ->select('admin_stocks.*', 'products.name as product_name')
         ->latest()->get();
         return $this->success($stocks);
     }
@@ -36,7 +36,7 @@ class ProductStockController extends Controller
     public function store(ProductStockRequest $request): JsonResponse
     {
         try {
-            $stock = ProductStock::query()->create($request->validated());
+            $stock = AdminStock::query()->create($request->validated());
             return $this->success($stock);
         } catch (\Exception $exception) {
             return $this->failed(null, $exception->getMessage(), 500);
