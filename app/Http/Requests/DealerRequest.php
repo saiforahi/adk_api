@@ -28,7 +28,7 @@ class DealerRequest extends FormRequest
         return [
             //
             'dealer_type_id' => 'required|exists:dealer_types,id',
-            'reference_id'=>'required|string|max:255|exists:pre_n_sub_dealers,id',
+            'reference_id'=>'required|string|max:255|exists:tycoons,id',
             'username' => [
                 'required',
                 'string',
