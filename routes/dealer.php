@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\v1\dealer\DealerController;
+use App\Http\Controllers\v1\dealer\WalletController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\v1\product\ProductStockController;
 
@@ -21,5 +22,8 @@ Route::middleware('auth:dealer')->group(function () {
         Route::group(['prefix' => 'courier-app'], function () {
             
         });
+    });
+    Route::group(['prefix' => 'wallet'], function () {
+        Route::post('/topup-request', [WalletController::class,'submit_topup_request']);
     });
 });

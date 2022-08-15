@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\v1\admin\ProductStockOrderController;
+use App\Http\Controllers\v1\admin\TopUpRequestController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,7 +18,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:admin'])->group(function () {
     Route::group(['prefix' => 'product'], function () {
+        Route::get('stock', [ProductStockOrderController::class, 'admin_product_stocks']);
         Route::get('stock-orders/requests', [ProductStockOrderController::class, 'product_stock_orders']);
         Route::post('/stock-orders/update-status', [ProductStockOrderController::class,'product_stock_order_status_update']);
+    });
+    Route::group(['prefix' => 'topup-requests'], function () {
+        Route::get('all/{type}', [TopUpRequestController::class, 'all_requests_from_dealers']);
+        Route::post('status/update', [TopUpRequestController::class, 'update_status']);
     });
 });

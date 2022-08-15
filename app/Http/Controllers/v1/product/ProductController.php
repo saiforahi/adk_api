@@ -5,7 +5,10 @@ namespace App\Http\Controllers\v1\product;
 use App\Events\v1\UploadImageEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
+use App\Models\AdminStock;
+use App\Models\DealerProductStock;
 use App\Models\Product;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -119,7 +122,15 @@ class ProductController extends Controller
         return $product;
     }
 
-    public function all_stockable_products(){
+    public function _all_stockable_products(){
+        try{
+            $admin_stocks=AdminStock::with('product')->get()->toArray();
+            $dealer_stocks = DealerProductStock::with('product')->select('product')->get()->toArray();
 
+            return $this->success(array_merge($admin_stocks,$dealer_stocks), 'Stockable product list');
+        }
+        catch(Exception $e){
+            return $this->failed(null, $e->getMessage(), 500);
+        }
     }
 }

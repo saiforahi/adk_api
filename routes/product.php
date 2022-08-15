@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/product-groups/{product_group}', [ProductGroupController::class, 'update']);
 Route::resource('/groups', ProductGroupController::class);
-
+Route::get('/stockable-products', [ProductController::class,'_all_stockable_products']);
 /**
  * Product & Product stocks Routes
  */

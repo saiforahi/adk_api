@@ -5,6 +5,7 @@ namespace App\Http\Controllers\v1\admin;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\v1\product\ProductStockController;
 use App\Models\Admin;
+use App\Models\AdminStock;
 use App\Models\DealerProductStock;
 use App\Models\ProductStockOrder;
 use Exception;
@@ -60,6 +61,16 @@ class ProductStockOrderController extends Controller
             }
             
             return $this->success($order, 'Product Stock order status updated',200);
+        }
+        catch(Exception $e){
+            return $this->failed(null, $e->getMessage(), 500);
+        }
+    }
+
+    public function admin_product_stocks(){
+        try{
+            $stocks=AdminStock::with('product')->get();
+            return $this->success($stocks, 'Admin Product Stocks',200);
         }
         catch(Exception $e){
             return $this->failed(null, $e->getMessage(), 500);

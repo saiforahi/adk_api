@@ -30,7 +30,7 @@ class SupplierRequest extends FormRequest
             'first_name'=>'required|string|max:255',
             'last_name'=>'sometimes|nullable|string|max:255',
             'email'=>'required|email|unique:suppliers,email',
-            'phone'=>'required|string|max:20|min:9||unique:suppliers,phone',
+            'phone'=>'required|string|max:20|min:9|unique:suppliers,phone',
             'address'=>'sometimes|nullable',
             // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
             'image' => 'nullable',
