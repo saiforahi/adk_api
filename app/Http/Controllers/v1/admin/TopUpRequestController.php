@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Dealer;
 use App\Models\DealerWallet;
 use App\Models\TopUpRequest;
+use App\Models\Tycoon;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -14,17 +15,21 @@ use Illuminate\Support\Facades\Auth;
 class TopUpRequestController extends Controller
 {
     //
-    public function all_requests_from_dealers($type){
+    public function all_topup_requests($type){
         try{
             $requests=array();
             switch($type){
                 case "dealer":
-                    
                     $requests = TopUpRequest::with(['request_from'])->whereHasMorph('request_from',Dealer::class,function(Builder $query){
                         $query->orderBy('created_at', 'desc');
                     })->get();
                     break;
 
+                case "tycoon":
+                    $requests = TopUpRequest::with(['request_from'])->whereHasMorph('request_from',Tycoon::class,function(Builder $query){
+                        $query->orderBy('created_at', 'desc');
+                    })->get();
+                    break;
             }
             
             return $this->success($requests, 'data', 200);

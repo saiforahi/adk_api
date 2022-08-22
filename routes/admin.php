@@ -23,7 +23,7 @@ Route::middleware(['auth:admin'])->group(function () {
         Route::post('/stock-orders/update-status', [ProductStockOrderController::class,'product_stock_order_status_update']);
     });
     Route::group(['prefix' => 'topup-requests'], function () {
-        Route::get('all/{type}', [TopUpRequestController::class, 'all_requests_from_dealers']);
+        Route::get('all/{type}', [TopUpRequestController::class, 'all_topup_requests']);
         Route::post('status/update', [TopUpRequestController::class, 'update_status']);
     });
 });
