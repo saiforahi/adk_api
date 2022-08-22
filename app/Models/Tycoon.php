@@ -16,8 +16,37 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Tycoon extends Authenticatable implements HasMedia,MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable,InteractsWithMedia,HasRoles,SoftDeletes;
-    protected $table="tycoons";
+    protected $guard_name = 'tycoon';
+    protected $table='tycoons';
     protected $guarded=[];
-    protected $guard="pre_n_sub_dealers";
-
+    protected $hidden=['password','remember_token'];
+    // protected $with = ['wallet','guard__name'];
+    protected $casts = [
+        'email_verified_at' => 'datetime:Y-m-d h:i:s A',
+        'created_at'=>'datetime:Y-m-d h:i:s A',
+        'updated_at'=>'datetime:Y-m-d h:i:s A',
+        'deleted_at'=>'datetime:Y-m-d h:i:s A'
+    ];
+    // returning guard name
+    public function guard__name(){
+        return $this->guard_name;
+    }
+    // media functions
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $this->addMediaConversion('profile_pic')
+              ->width(247)
+              ->height(300)
+              ->sharpen(10)
+              ->queued();
+    }
+    public function registerMediaCollections(): void
+    {
+        // $this->addMediaCollection('thumb')->useDisk('public')->acceptsMimeTypes(['image/jpeg','image/jpg','image/png','image/webp'])->withResponsiveImages();
+        $this
+            ->addMediaCollection('profile_pic')
+            ->useDisk('public')
+            ->acceptsMimeTypes(['image/jpeg','image/jpg','image/png','image/webp'])
+            ->withResponsiveImages();
+    }
 }
