@@ -20,7 +20,7 @@ class SupplierController extends Controller
     //
     public function __construct()
     {
-        $this->middleware(['auth:admin'])->except([]);
+        // $this->middleware(['auth:admin'])->except([]);
         // $this->middleware('role:super-admin|unit-admin')->except([]);
     }
 
