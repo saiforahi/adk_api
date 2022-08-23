@@ -13,6 +13,7 @@ Route::get('/stockable-products', [ProductController::class,'_all_stockable_prod
  * Product & Product stocks Routes
  */
 Route::post('/products/{product}', [ProductController::class, 'update']);
+Route::get('/products/{product}', [ProductController::class, 'show']);
 
 Route::post('/product-stocks/{product}', [ProductStockController::class, 'update']);
 Route::resource('/product-stocks', ProductStockController::class);
