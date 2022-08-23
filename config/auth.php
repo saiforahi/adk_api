@@ -51,8 +51,7 @@ return [
 
         'tycoon' => [
             'driver' => 'sanctum',
-            'provider' => 'tycoons',
-            'hash' => false,
+            'provider' => 'tycoons'
         ],
         'staff' => [
             'driver' => 'sanctum',
