@@ -79,6 +79,10 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('api/commission')
                 ->namespace($this->namespace)
                 ->group(base_path('routes/commission.php'));
+            Route::middleware('api')
+                ->prefix('api/tycoon-panel')
+                ->namespace($this->namespace)
+                ->group(base_path('routes/tycoon_panel.php'));
         });
     }
 
