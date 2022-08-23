@@ -44,7 +44,7 @@ class CategoryController extends Controller
         try {
 
             $data = Arr::except($request->validated(), ['icon', 'banner']);
-            $data['slug'] = Str::slug($data['name']);
+            $data['slug'] = Str::slug($request->name);
             $category = Category::query()->create($data);
             $this->uploadImage($request, $category);
             return $this->success($category);

@@ -14,6 +14,7 @@ use lemonpatwari\bangladeshgeocode\Models\Division;
 use lemonpatwari\bangladeshgeocode\Models\District;
 use lemonpatwari\bangladeshgeocode\Models\Thana;
 use lemonpatwari\bangladeshgeocode\Models\Union;
+use Illuminate\Validation\Rule;
 
 class SupplierController extends Controller
 {
@@ -73,8 +74,13 @@ class SupplierController extends Controller
                 'first_name'=>'required|string|max:255',
                 'last_name'=>'sometimes|nullable|string|max:255',
                 'email'=>'required|email|exists:suppliers,email',
-                'phone'=>'required|string|max:20|min:9||unique:suppliers,phone',
-                'address'=>'sometimes|nullable',
+                'phone'=>
+                [
+                    'required',
+                    Rule::unique('suppliers')
+                        ->ignore($supplier)
+                        ->whereNull('deleted_at')
+                ],                'address'=>'sometimes|nullable',
                 // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
                 'image' => 'nullable',
             ]);
