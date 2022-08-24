@@ -26,6 +26,7 @@ class Category extends Model implements HasMedia
         'name',
         // 'meta_title',
         // 'meta_description',
+        'slug',
         'icon',
         'banner',
         // 'slug',
