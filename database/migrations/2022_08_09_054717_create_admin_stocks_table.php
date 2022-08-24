@@ -14,6 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('admin_stocks', function (Blueprint $table) {
+            $table->id();
             $table->unsignedBigInteger('product_id');
             $table->double('quantity')->default(0);
             $table->softDeletes();

@@ -13,8 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('product_wallets', function (Blueprint $table) {
+        Schema::create('tycoon_wallets', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('tycoon_id')->unique();
+            $table->float('product_balance', $precision = 19, $scale = 2);
+            $table->foreign('tycoon_id')->references('id')->on('tycoons');
             $table->timestamps();
         });
     }
@@ -26,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('product_wallets');
+        Schema::dropIfExists('tycoon_wallets');
     }
 };

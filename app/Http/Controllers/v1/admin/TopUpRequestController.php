@@ -7,6 +7,7 @@ use App\Models\Dealer;
 use App\Models\DealerWallet;
 use App\Models\TopUpRequest;
 use App\Models\Tycoon;
+use App\Models\TycoonWallet;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -60,6 +61,11 @@ class TopUpRequestController extends Controller
                     $request->status= $req->status;
                     if($request->request_from_type=="App\Models\Dealer"){
                         $dealer_wallet=DealerWallet::where('dealer_id',$request->request_from->id)->first();
+                        $dealer_wallet->product_balance+=$request->amount;
+                        $dealer_wallet->save();
+                    }
+                    elseif($request->request_from_type=="App\Models\Tycoon"){
+                        $dealer_wallet=TycoonWallet::where('tycoon_id',$request->request_from->id)->first();
                         $dealer_wallet->product_balance+=$request->amount;
                         $dealer_wallet->save();
                     }

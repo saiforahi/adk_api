@@ -11,4 +11,9 @@ Route::prefix('tycoon')->group(function () {
     Route::delete('delete/{dealer}',[TycoonController::class,'_delete']);
 });
 
+// top up requests
+Route::group(['prefix' => 'wallet'], function () {
+    Route::post('/topup-request', [TycoonController::class,'submit_topup_request']);
+});
+
 

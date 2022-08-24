@@ -5,12 +5,17 @@ namespace App\Http\Controllers\v1\TycoonPanel;
 use App\Events\v1\UploadImageEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TycoonPanel\TycoonRequest;
+use App\Http\Requests\WalletTopUpRequest;
+use App\Models\TopupRequest;
 use App\Models\Tycoon;
+use App\Models\TycoonWallet;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class TycoonController extends Controller
 {
@@ -39,6 +44,9 @@ class TycoonController extends Controller
      
             $data=array('password'=>Hash::make($req->password), 'user_id'=>date('Y').date('m').date('d').Tycoon::all()->count(), 'reference_id' => auth()->user()->id);
             $tycoon = Tycoon::create(array_merge($req->except('password'),$data));
+            $tycoon_wallet= TycoonWallet::create([
+                'tycoon_id'=>$tycoon->id
+            ]);
           
             $images=array();
             if($req->hasFile('image') && $req->file('image')->isValid()){
@@ -91,5 +99,23 @@ class TycoonController extends Controller
     {
         $dealer->delete();
         return $this->success($dealer, 'Dealer Deleted Successfully');
+    }
+
+    // submit topup request
+    public function submit_topup_request(WalletTopUpRequest $req){
+        try{
+            $new_request = TopupRequest::create($req->all());
+            $new_request->request_from()->associate(Auth::user());
+            if ($req->hasFile('document') && $req->file('document')->isValid()) {
+                $path = request()->file('document')->store('public/topup_request_docs');
+                $new_request->document_download_link=env("APP_URL").Storage::url($path);
+                $new_request->document=$path;
+                $new_request->save();
+            }
+            return $this->success($new_request, 'data', 200);
+        }
+        catch (Exception $e){
+            return $this->failed($e->getMessage(), $e->getMessage(), 500);
+        }
     }
 }
