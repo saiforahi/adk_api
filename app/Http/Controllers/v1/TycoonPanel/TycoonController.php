@@ -28,7 +28,7 @@ class TycoonController extends Controller
     public function _all():JsonResponse
     {
         try{
-            return $this->success(Tycoon::where('reference_id', auth()->user()->id)->select('tycoons.*', DB::raw('CONCAT(tycoons.first_name, " ", tycoons.last_name) AS name'
+            return $this->success(Tycoon::where('reference_id', auth()->user()->id)->orWhere('reference_id', auth()->user()->reference_id)->select('tycoons.*', DB::raw('CONCAT(tycoons.first_name, " ", tycoons.last_name) AS name'
             ))->get());
         }
         catch(Exception $e){
