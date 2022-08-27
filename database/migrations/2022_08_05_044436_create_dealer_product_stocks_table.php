@@ -21,7 +21,6 @@ return new class extends Migration
             $table->integer('qty')->comment('product quantity');
             $table->unsignedBigInteger('warehouse')->nullable();
             $table->timestamps();
-            
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreign('dealer_id')->references('id')->on('dealers')->onDelete('cascade');
         });

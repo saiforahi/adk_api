@@ -14,7 +14,7 @@ if (!function_exists('get_first_user_by_email')) {
         } elseif (Dealer::where('email',$email)->exists()){
             $user = Dealer::with('roles')->with('wallet')->where('email',$email)->first();
         } else if (Tycoon::where('email',$email)->exists()){
-            $user = Tycoon::with('roles')->where('email',$email)->first();
+            $user = Tycoon::with('roles')->with('wallet')->where('email',$email)->first();
         }
         // else if(PreDealer::where('email',$email)->exists()){
         //     $user = PreDealer::where('email',$email)->first();

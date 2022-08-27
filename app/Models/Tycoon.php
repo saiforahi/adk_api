@@ -31,6 +31,13 @@ class Tycoon extends Authenticatable implements HasMedia,MustVerifyEmail
     public function guard__name(){
         return $this->guard_name;
     }
+    // polymorphic relation to product stock order table
+    public function product_stock_orders(){
+        return $this->morphMany(ProductStockOrder::class, 'order_from');
+    }
+    public function product_stock_orders_to_me(){
+        return $this->morphMany(ProductStockOrder::class, 'order_to');
+    }
     // media functions
     public function registerMediaConversions(Media $media = null): void
     {
@@ -48,5 +55,8 @@ class Tycoon extends Authenticatable implements HasMedia,MustVerifyEmail
             ->useDisk('public')
             ->acceptsMimeTypes(['image/jpeg','image/jpg','image/png','image/webp'])
             ->withResponsiveImages();
+    }
+    public function wallet(){
+        return $this->hasOne(TycoonWallet::class, 'id');
     }
 }

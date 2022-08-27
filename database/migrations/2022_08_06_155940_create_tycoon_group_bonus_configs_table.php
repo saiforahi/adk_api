@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('tycoon_group_bonus_configs', function (Blueprint $table) {
             $table->id();
-            $table->string('group_no');
+            $table->integer('group_no');
             $table->double('bonus_percentage')->nullable();
             $table->timestamps();
         });

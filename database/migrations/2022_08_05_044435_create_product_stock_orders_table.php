@@ -20,6 +20,7 @@ return new class extends Migration
             $table->nullableMorphs('order_to');
             $table->unsignedBigInteger('product_id')->nullable();
             $table->integer('qty')->comment('product quantity');
+            $table->float('price', $precision = 19, $scale = 2);
             $table->mediumText('order_notes')->nullable();
             $table->enum('status',['APPROVED','PENDING','PROCESSED'])->default('PENDING');
             $table->timestamps();
