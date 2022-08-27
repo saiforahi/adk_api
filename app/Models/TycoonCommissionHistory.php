@@ -13,10 +13,10 @@ class TycoonCommissionHistory extends Model
 
     public function tycoon()
     {
-        return $this->belongsTo(Tycoon::class, 'id');
+        return $this->belongsTo(Tycoon::class);
     }
     public function product()
     {
-        return $this->belongsTo(Product::class, 'id');
+        return $this->belongsTo(Product::class);
     }
 }

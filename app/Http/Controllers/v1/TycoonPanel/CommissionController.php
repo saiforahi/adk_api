@@ -18,7 +18,7 @@ class CommissionController extends Controller
     {
         try{
             $orders=array();
-            $orders = TycoonCommissionHistory::with(['product','tycoon'])->where('tycoon_id', auth()->user()->id)->get();
+            $orders = TycoonCommissionHistory::with('product:id,name','tycoon:id,first_name,last_name')->where('tycoon_id', auth()->user()->id)->get();
             return $this->success($orders, 'Commission', 200);
         }
         catch(Exception $e){
