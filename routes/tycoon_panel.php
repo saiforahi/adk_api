@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\v1\TycoonPanel\TycoonController;
 use App\Http\Controllers\v1\TycoonPanel\OrderController;
+use App\Http\Controllers\v1\TycoonPanel\CommissionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('tycoon')->group(function () {
@@ -23,6 +24,9 @@ Route::middleware('auth:tycoon')->group(function () {
     Route::group(['prefix' => 'product'], function () {
         Route::get('/orders', [OrderController::class,'product_orders']);
         Route::post('/order/store', [OrderController::class,'_store_order']);
+    });
+    Route::group(['prefix' => 'commissions'], function () {
+        Route::get('/history', [CommissionController::class,'_all']);
     });
 });
 

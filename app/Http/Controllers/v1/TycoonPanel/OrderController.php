@@ -4,7 +4,7 @@ namespace App\Http\Controllers\v1\TycoonPanel;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductStockRequest;
-use App\Models\{ DealerProductStock, TycoonBonusConfig, AdminStock, TycoonWallet, Tycoon, ProductStockOrder, Admin };
+use App\Models\{ DealerProductStock, TycoonBonusConfig,TycoonGroupBonusConfig, AdminStock, TycoonWallet, Tycoon, ProductStockOrder, Admin};
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -14,15 +14,15 @@ use Illuminate\Support\Facades\Auth;
 use App\Events\v1\CommissionDistributionEvent;
 
 use DB;
-
 class OrderController extends Controller
 {
 
     public function _store_order(Request $req)
     {
+
+
         DB::beginTransaction();
 
-        try{
             $req->validate([
                 'products'=> 'required'
             ]);
@@ -32,37 +32,45 @@ class OrderController extends Controller
                         'order_id'=> $this->orderId(),
                         'product_id'=>$product['product_id'],
                         'qty'=> $product['quantity'],
+                        'price'=> $product['price'],
                         'status'=> 'APPROVED',
                         'order_notes'=> 'null'
                     ]);
                     $new_order->order_from()->associate(Auth::user());
                     $new_order->order_to()->associate(Admin::first());
                     $new_order->save();
+
+                    // // bonus distribution
+                    // $bonus = [
+                    //     'product_id' => $product['product_id'],
+                    //     'bonus_type' => 'instant_sale',
+                    //     'amount' => $product['quantity'] * $product['price'],
+                    //     'tycoon_id' => auth()->user()->reference_id ? auth()->user()->reference_id : 1,
+                    //     'placement_id' => auth()->user()->placement_id ? auth()->user()->placement_id : 1
+                    // ];
+                    // event(new CommissionDistributionEvent($bonus));
+
+                    // bonus distribution
+                    $bonus = [
+                        'product_id' => $product['product_id'],
+                        'bonus_type' => 'group_bonus',
+                        'amount' => $product['quantity'] * $product['price'],
+                        'tycoon_id' => auth()->user()->reference_id ? auth()->user()->reference_id : 1,
+                        'placement_id' => auth()->user()->placement_id ? auth()->user()->placement_id : 1
+                    ];
+                    event(new CommissionDistributionEvent($bonus));
+
                 }
-                $dat = TycoonWallet::where('tycoon_id',Auth::user()->id)->update([
+                TycoonWallet::where('tycoon_id',Auth::user()->id)->update([
                     'product_balance'=> Auth::user()->wallet->product_balance-(float)$req->totalAmount
                 ]);
-                $tycoon_bonus = TycoonBonusConfig::where('bonus_type', 'instant_sale')->first();
-                $bonus = [
-                    'wallet_type' => 'sales_commission',
-                    'bonus_type' => 'instant_sale',
-                    'amount' => ($req->totalAmount * $tycoon_bonus->bonus_percentage) / 100,
-                    'tycoon_id' => auth()->user()->reference_id ? auth()->user()->reference_id : 1
-                ];
-                event(new CommissionDistributionEvent($bonus));
                 DB:: commit();
                 return $this->success($req->all(), 'Order successfully completed.');
             }
             else{
                 return $this->failed(null,'Insuficient product balance');
             }
-            
-        }
-        catch(Exception $e){
-            DB::rollback();
 
-            return $this->failed(null, $e->getMessage(), 500);
-        }
     }
 
     private function orderId () {

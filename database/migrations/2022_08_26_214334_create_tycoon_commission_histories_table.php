@@ -16,9 +16,11 @@ return new class extends Migration
         Schema::create('tycoon_commission_histories', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('tycoon_id');
+            $table->unsignedBigInteger('product_id');
             $table->string('bonus_type', 100);
             $table->float('amount', $precision = 19, $scale = 2);
             $table->foreign('tycoon_id')->references('id')->on('tycoons');
+            $table->foreign('product_id')->references('id')->on('products');
             $table->timestamps();
         });
     }
