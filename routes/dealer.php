@@ -16,8 +16,8 @@ Route::put('wallet/update/product-balance',[DealerController::class,'_update_pro
 
 Route::middleware('auth:dealer')->group(function () {
     Route::group(['prefix' => 'product'], function () {
-        Route::get('/stock', [DealerController::class,'product_stocks']);
         Route::get('/stock-orders/{type}', [ProductStockController::class,'product_stock_orders']);
+        Route::get('/stock', [DealerController::class,'product_stocks']);
         Route::post('/stock-orders/update-status', [ProductStockController::class,'product_stock_order_status_update']);
         Route::group(['prefix' => 'courier-app'], function () {
             

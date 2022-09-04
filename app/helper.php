@@ -10,7 +10,7 @@ if (!function_exists('get_first_user_by_email')) {
     {
         $user = null;
         if(Admin::where('email',$email)->exists()){
-            $user = Admin::with('roles')->where('email',$email)->first();
+            $user = Admin::with('roles')->with('wallet')->where('email',$email)->first();
         } elseif (Dealer::where('email',$email)->exists()){
             $user = Dealer::with('roles')->with('wallet')->where('email',$email)->first();
         } else if (Tycoon::where('email',$email)->exists()){

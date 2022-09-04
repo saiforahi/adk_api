@@ -109,6 +109,7 @@ class DealerController extends Controller
                         'order_id'=>"1",
                         'product_id'=>$product['product_id'],
                         'qty'=> $product['quantity'],
+                        'price'=> $product['price'],
                         'order_notes'=> 'null'
                     ]);
                     $new_order->order_from()->associate(Auth::user());

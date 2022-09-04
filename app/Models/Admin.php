@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -12,7 +13,6 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Admin extends Authenticatable implements HasMedia,MustVerifyEmail
 {
@@ -46,5 +46,8 @@ class Admin extends Authenticatable implements HasMedia,MustVerifyEmail
             ->useDisk('public')
             ->acceptsMimeTypes(['image/jpeg','image/jpg','image/png','image/webp'])
             ->withResponsiveImages();
+    }
+    public function wallet(){
+        return $this->hasOne(AdminWallet::class);
     }
 }
