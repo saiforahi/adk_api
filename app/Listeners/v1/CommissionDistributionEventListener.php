@@ -5,7 +5,7 @@ namespace App\Listeners\v1;
 use App\Events\v1\CommissionDistributionEvent as CommissionDistributionEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-use App\Models\{TycoonCommissionHistory, TycoonWallet, TycoonGroupBonusConfig, TycoonBonusConfig, Tycoon};
+use App\Models\{TycoonCommissionHistory, TycoonWallet, TycoonGroupBonusConfig, TycoonBonusConfig, Tycoon, AdminWallet};
 use Illuminate\Support\Facades\Log;
 
 class CommissionDistributionEventListener
@@ -53,9 +53,22 @@ class CommissionDistributionEventListener
     }
 
     // group bonus distribution here
-    private function group_bonus_distribution($data = [], $percentage = 0) :void {
+    private function group_bonus_distribution($data = [], $percentage = 0) {
+        $toal_bonus = ($data['amount'] * $percentage) / 100;
         $tycoons = Tycoon::get();
         $group_1 = Tycoon::where('user_id', auth()->user()->placement_id)->first();
+
+        if(!$group_1) {
+            // update adk wallet
+            $masterTycoon = AdminWallet::first();
+            $masterTycoon->tycoon_group_commission_gap = $masterTycoon->tycoon_group_commission_gap + $toal_bonus;
+            $masterTycoon->save();
+            $data['tycoon_id'] = 1;
+            $data['type'] = 1;
+            $this->storeBonudHistory($data, $toal_bonus);
+            return true;
+        }
+
         array_push($this->datas, $group_1);
         foreach($tycoons as $tycoon) {
             if ($tycoon->user_id == $group_1->placement_id) {
@@ -63,16 +76,26 @@ class CommissionDistributionEventListener
                 $this->tycoon($tycoons, $tycoon);
             }
         }
-        $toal_bonus = ($data['amount'] * $percentage) / 100;
         $groupBonus= TycoonGroupBonusConfig::orderBy('group_no', 'asc')->get();
+        $total_pay = 0;
         foreach($this->datas as $key=>$value) {
             if(20 > $key) {
                 $amount = ($toal_bonus * $groupBonus[$key]->bonus_percentage) / 100;
                 $this->updateWallet('group_commission', $amount, $data['tycoon_id']);
                 $data['tycoon_id'] = $value->id;
                 $this->storeBonudHistory($data, $amount);
+                $total_pay += $amount;
             }
         }
+
+        // update adk wallet
+        $total_gap = $toal_bonus - $total_pay;
+        if ($total_gap > 0) {
+            $masterTycoon = AdminWallet::first();
+            $masterTycoon->tycoon_group_commission_gap = $masterTycoon->tycoon_group_commission_gap + $total_gap;
+            $masterTycoon->update();
+        }
+
     }
 
     private function tycoon ($tycoons, $tycoon) {
@@ -108,6 +131,5 @@ class CommissionDistributionEventListener
             'amount' => $amount,
             'tycoon_id' => $data['tycoon_id']
         ]);
-
     }
 }

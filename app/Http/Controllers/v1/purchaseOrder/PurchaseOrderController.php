@@ -89,15 +89,11 @@ class PurchaseOrderController extends Controller
                 if ($oldStock) {
                     $oldStock->update([
                         'product_id' => $item['product_id'],
-                        'price' => $item['cost'],
                         'quantity' => $item['req_quantity'] + $oldStock->quantity
                         ]);
                 } else {
                     AdminStock::create([
                         'product_id' => $item['product_id'],  
-                        'variant' => '',
-                        'sku' => '',
-                        'price' => $item['cost'],
                         'quantity' => $item['req_quantity'],
                         ]);
                 }

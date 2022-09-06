@@ -40,15 +40,15 @@ class OrderController extends Controller
                     $new_order->order_to()->associate(Admin::first());
                     $new_order->save();
 
-                    // // bonus distribution
-                    // $bonus = [
-                    //     'product_id' => $product['product_id'],
-                    //     'bonus_type' => 'instant_sale',
-                    //     'amount' => $product['quantity'] * $product['price'],
-                    //     'tycoon_id' => auth()->user()->reference_id ? auth()->user()->reference_id : 1,
-                    //     'placement_id' => auth()->user()->placement_id ? auth()->user()->placement_id : 1
-                    // ];
-                    // event(new CommissionDistributionEvent($bonus));
+                    // bonus distribution
+                    $bonus = [
+                        'product_id' => $product['product_id'],
+                        'bonus_type' => 'instant_sale',
+                        'amount' => $product['quantity'] * $product['price'],
+                        'tycoon_id' => auth()->user()->reference_id ? auth()->user()->reference_id : 1,
+                        'placement_id' => auth()->user()->placement_id ? auth()->user()->placement_id : 1
+                    ];
+                    event(new CommissionDistributionEvent($bonus));
 
                     // bonus distribution
                     $bonus = [
