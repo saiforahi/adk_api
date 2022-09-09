@@ -57,6 +57,6 @@ class Tycoon extends Authenticatable implements HasMedia,MustVerifyEmail
             ->withResponsiveImages();
     }
     public function wallet(){
-        return $this->hasOne(TycoonWallet::class, 'id');
+        return $this->hasOne(TycoonWallet::class);
     }
 }
