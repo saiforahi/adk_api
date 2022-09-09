@@ -164,7 +164,7 @@ class ProductController extends Controller
         try{
             $admin_stocks=AdminStock::with('product')->get()->toArray();
             
-            $all_upazilla_dealers=Dealer::with('stocked_products')->where('dealer_type_id',DealerType::where('name','Upazilla Dealer')->first()->id)->where('thana_id',Auth::user()->thana_id)->get()->toArray();
+            $all_upazilla_dealers=Dealer::with('stocked_products')->where('dealer_type_id',DealerType::where('name','Upazilla Dealer')->first()->id)->get()->toArray();
             $data=['ADK'=>$admin_stocks,'dealers'=>$all_upazilla_dealers];
             return $this->success($data, 'Stockable product list for tycoon');
         }
