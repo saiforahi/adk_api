@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\v1\product\ProductController;
 use App\Http\Controllers\v1\TycoonPanel\TycoonController;
 use App\Http\Controllers\v1\TycoonPanel\OrderController;
 use App\Http\Controllers\v1\TycoonPanel\CommissionController;
@@ -22,6 +23,7 @@ Route::group(['prefix' => 'wallet'], function () {
 // product order
 Route::middleware('auth:tycoon')->group(function () {
     Route::group(['prefix' => 'product'], function () {
+        Route::get('stockable/list', [ProductController::class,'stockable_product_list_tycoon']);
         Route::get('/orders', [OrderController::class,'product_orders']);
         Route::post('/order/store', [OrderController::class,'_store_order']);
     });

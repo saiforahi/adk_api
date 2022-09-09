@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\v1\auth;
 
 use Auth;
-use App\Models\User;
-use App\Models\Dealer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
@@ -73,27 +72,7 @@ class AuthController extends Controller
         try{
             $response='';
             $user = '';
-            switch($request->type){
-                case 'merchant':    //merchant creation
-                    $validator=Validator::make($request->all(),$this->dealer_reg_rules);
-                    if($validator->fails()){                                //merchant registration validation
-                        return response()->json(['success'=>false,'errors'=>$validator->errors()], 422);
-                    }
-                    $user = User::create(array_merge($request->all(),['password' => bcrypt($request->password)]));
-                    break;
-
-                case 'courier':  //courier creation
-                    $request->validate(['id_no'=>'required|unique:couriers,nid_no']);
-                    $user = Courier::create(array_merge($request->all(),['employee_id'=>random_unique_string_generate(Courier::class,'employee_id'),'password' => bcrypt($request->password)]));
-                    break;
-            }
-            if($request->id_type == 'NID'){
-                $user->nid_no = $request->id_no;
-            }
-            else{
-                $user->bin_no = $request->id_no;
-            }
-            $user->save();
+           
             return response()->json([
                 'success' => true,
                 'message'=> 'Registration Successful',

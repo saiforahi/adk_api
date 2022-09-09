@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('admin_wallets', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('admin_id')->unique();
             $table->float('product_balance', $precision = 19, $scale = 2)->default(0);
             $table->float('marketing_balance', $precision = 19, $scale = 2)->default(0);
             $table->float('stock_balance', $precision = 19, $scale = 2)->default(0);
@@ -31,6 +32,8 @@ return new class extends Migration
             $table->float('monthly_sales', $precision = 19, $scale = 2)->default(0);
             $table->float('expense', $precision = 19, $scale = 2)->default(0);
             $table->timestamps();
+
+            $table->foreign('admin_id')->references('id')->on('admins');
         });
     }
 

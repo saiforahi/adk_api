@@ -6,12 +6,15 @@ use App\Events\v1\UploadImageEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
 use App\Models\AdminStock;
+use App\Models\Dealer;
 use App\Models\DealerProductStock;
+use App\Models\DealerType;
 use App\Models\Product;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -122,12 +125,48 @@ class ProductController extends Controller
         return $product;
     }
 
-    public function _all_stockable_products(){
+    public function stockable_product_list_dealer(){
         try{
             $admin_stocks=AdminStock::with('product')->get()->toArray();
-            $dealer_stocks = DealerProductStock::with('product')->select('product')->get()->toArray();
+            $dealer_stocks=[];
+            $type=Auth::user()->dealer_type_id;
+            if($type==1){
+                $dealer_stocks = [];
+            }
+            elseif($type==2){
+                $dealer_stocks=Dealer::with('stocked_products')->where('division_id',Auth::user()->division_id)->where('division_id','!=',null)->get()->toArray();
+            }
+            elseif($type==3){
+                $dealer_stocks=Dealer::with('stocked_products')->where('division_id',Auth::user()->district_id)->where('division_id','!=',null)->get()->toArray();
+            }
+            // swicth($type){
+            //     case 1:
+            //         $dealer_stocks = [];
+            //         break;
+            //     case 2:
+            //         $dealer_stocks=Dealer::with('stocked_products')->where('division_id',Auth::user()->division_id)->get()->toArray();
+            //         break;
+            //     case 3:
+            //         $dealer_stocks=Dealer::with('stocked_products')->where('division_id',Auth::user()->district_id)->get()->toArray();
+            //         break;
+            //     default:
+            //         $dealer_stocks = [];
+            // }
+            $data=['ADK'=>$admin_stocks,'dealers'=>$dealer_stocks];
+            return $this->success($data, 'Stockable product list for tycoon');  
+        }
+        catch(Exception $e){
+            return $this->failed(null, $e->getMessage(), 500);
+        }
+    }
 
-            return $this->success(array_merge($admin_stocks,$dealer_stocks), 'Stockable product list');
+    public function stockable_product_list_tycoon(){
+        try{
+            $admin_stocks=AdminStock::with('product')->get()->toArray();
+            
+            $all_upazilla_dealers=Dealer::with('stocked_products')->where('dealer_type_id',DealerType::where('name','Upazilla Dealer')->first()->id)->get()->toArray();
+            $data=['ADK'=>$admin_stocks,'dealers'=>$all_upazilla_dealers];
+            return $this->success($data, 'Stockable product list for tycoon');
         }
         catch(Exception $e){
             return $this->failed(null, $e->getMessage(), 500);
