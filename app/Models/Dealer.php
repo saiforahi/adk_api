@@ -31,6 +31,10 @@ class Dealer extends Authenticatable implements HasMedia,MustVerifyEmail
     public function guard__name(){
         return $this->guard_name;
     }
+    // all stocked products
+    public function stocked_products(){
+        return $this->hasMany(DealerProductStock::class);
+    }
     // polymorphic relation to product stock order table
     public function product_stock_orders(){
         return $this->morphMany(ProductStockOrder::class, 'order_from');

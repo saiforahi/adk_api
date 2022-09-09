@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\v1\dealer\DealerController;
 use App\Http\Controllers\v1\dealer\WalletController;
+use App\Http\Controllers\v1\product\ProductController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\v1\product\ProductStockController;
 
@@ -17,6 +18,7 @@ Route::post('wallet/add-balance',[DealerController::class,'_update_product_balan
 
 Route::middleware('auth:dealer')->group(function () {
     Route::group(['prefix' => 'product'], function () {
+        Route::get('stockable/list', [ProductController::class,'stockable_product_list_dealer']);
         Route::get('/stock-orders/{type}', [ProductStockController::class,'product_stock_orders']);
         Route::get('/stock', [DealerController::class,'product_stocks']);
         Route::post('/stock-orders/update-status', [ProductStockController::class,'product_stock_order_status_update']);
