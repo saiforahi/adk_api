@@ -12,6 +12,7 @@ Route::get('details/{dealer}', [DealerController::class,'_details']);
 Route::delete('delete/{dealer}',[DealerController::class,'_delete']);
 Route::put('product/stock',[DealerController::class,'_product_stock_order'])->middleware('auth:dealer');
 Route::put('wallet/update/product-balance',[DealerController::class,'_update_product_balance']);
+Route::post('wallet/add-balance',[DealerController::class,'_update_product_balance']);
 
 
 Route::middleware('auth:dealer')->group(function () {

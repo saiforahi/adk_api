@@ -6,6 +6,7 @@ use App\Events\v1\UploadImageEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DealerRequest;
 use App\Models\Admin;
+use App\Models\BalanceTransfer;
 use App\Models\Dealer;
 use App\Models\DealerProduct;
 use App\Models\DealerProductStock;
@@ -29,15 +30,23 @@ class DealerController extends Controller
 
     public function _store(DealerRequest $req)
     {
+        DB::beginTransaction();
         try{
             $data=array('password'=>Hash::make($req->password), 'current_balance'=>$req->opening_balance,'user_id'=>date('Y').date('m').date('d').Dealer::all()->count());
             $new_dealer = Dealer::create(array_merge($req->except('password'),$data));
+            DealerWallet::create(
+                [
+                    'dealer_id' => $new_dealer->id,
+                    'product_balance' => $req->opening_balance
+                ],
+            );
             $images=array();
             if($req->hasFile('image') && $req->file('image')->isValid()){
                 array_push($images,$req->file('image'));
             }
             // dd($images);
             event(new UploadImageEvent($new_dealer,$images,'image'));
+            DB::commit();
             if($new_dealer){
                 return $this->success($new_dealer);
             }
@@ -46,6 +55,7 @@ class DealerController extends Controller
             }
         }
         catch(Exception $e){
+            DB::rollback();
             return $this->failed(null, $e->getMessage(), 500);
         }
     }
@@ -55,7 +65,7 @@ class DealerController extends Controller
     public function _all():JsonResponse
     {
         try{
-            return $this->success(Dealer::all());
+            return $this->success(Dealer::with('wallet:id,dealer_id,product_balance')->get());
         }
         catch(Exception $e){
             return $this->failed(null, $e->getMessage(), 500);
@@ -139,10 +149,33 @@ class DealerController extends Controller
             'amount'=> 'required|numeric'
         ]);
         try{
-            DB::table('dealer_wallets')->updateOrInsert(
+
+            $new_transfer = BalanceTransfer::create([
+                'amount'=> $req->amount,
+                'payment_type'=> 1,
+                'status'=> 'APPROVED'
+            ]);
+
+            $new_transfer->transfer_from()->associate(Auth::user());
+            $new_transfer->transfer_to()->associate(Dealer::first());
+            // $new_transfer->transfer_to()->associate();
+            $new_transfer->save();
+
+            DealerWallet::updateOrInsert(
                 ['dealer_id' => $req->dealer_id],
-                ['product_balance' => $req->amount]
+                ['product_balance' =>DB::raw('product_balance+'. $req->amount)]
             );
+
+            $new_transfer = BalanceTransfer::create([
+                'amount'=> $req->amount,
+                'payment_type'=> 3,
+                'status'=> 'APPROVED'
+            ]);
+
+            $new_transfer->transfer_from()->associate(Auth::user());
+            $new_transfer->transfer_to()->associate(Dealer::first());
+            $new_transfer->save();
+
             return $this->success(DealerWallet::with('dealer')->where('dealer_id',$req->dealer_id)->first(), 'Dealer wallet updated successfully');
         }
         catch(Exception $e){

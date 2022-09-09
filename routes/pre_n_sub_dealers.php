@@ -9,6 +9,7 @@ Route::post('update/{dealer}', [PreSubController::class, '_update']);
 Route::get('details/{dealer}', [PreSubController::class,'_details']);
 Route::delete('delete/{dealer}',[PreSubController::class,'_delete']);
 Route::get('sub_dealer_types',[PreSubController::class,'_all_sub_dealer_types']);
+Route::post('wallet/add-balance',[PreSubController::class,'_update_product_balance']);
 
 
 
