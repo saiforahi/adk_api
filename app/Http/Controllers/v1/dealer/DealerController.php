@@ -6,6 +6,7 @@ use App\Events\v1\UploadImageEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DealerRequest;
 use App\Models\Admin;
+use App\Models\AdminWallet;
 use App\Models\BalanceTransfer;
 use App\Models\Dealer;
 use App\Models\DealerProduct;
@@ -30,6 +31,11 @@ class DealerController extends Controller
 
     public function _store(DealerRequest $req)
     {
+
+        if(Auth::user()->wallet && Auth::user()->wallet->product_balance < (float)$req->opening_balance){
+            return $this->failed(null,'Insuficient product balance');
+        }
+
         DB::beginTransaction();
         try{
             $data=array('password'=>Hash::make($req->password), 'current_balance'=>$req->opening_balance,'user_id'=>date('Y').date('m').date('d').Dealer::all()->count());
@@ -39,6 +45,9 @@ class DealerController extends Controller
                     'dealer_id' => $new_dealer->id,
                     'product_balance' => $req->opening_balance
                 ],
+            );
+            AdminWallet::where('admin_id', auth()->user()->id)->update(
+                ['product_balance' => DB::raw('product_balance-'. $req->opening_balance)]
             );
             $images=array();
             if($req->hasFile('image') && $req->file('image')->isValid()){
@@ -148,6 +157,11 @@ class DealerController extends Controller
             'dealer_id'=>'required|exists:dealers,id',
             'amount'=> 'required|numeric'
         ]);
+
+        if(Auth::user()->wallet && Auth::user()->wallet->product_balance < (float)$req->opening_balance){
+            return $this->failed(null,'Insuficient product balance');
+        }
+
         try{
 
             $new_transfer = BalanceTransfer::create([
@@ -165,7 +179,9 @@ class DealerController extends Controller
                 ['dealer_id' => $req->dealer_id],
                 ['product_balance' =>DB::raw('product_balance+'. $req->amount)]
             );
-
+            AdminWallet::where('admin_id', auth()->user()->id)->update(
+                ['product_balance' => DB::raw('product_balance-'. $req->amount)]
+            );
             $new_transfer = BalanceTransfer::create([
                 'amount'=> $req->amount,
                 'payment_type'=> 3,

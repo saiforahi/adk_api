@@ -5,6 +5,7 @@ namespace App\Http\Controllers\v1\pre_n_sub;
 use App\Events\v1\UploadImageEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PreSubDealerRequest;
+use App\Models\AdminWallet;
 use App\Models\BalanceTransfer;
 use App\Models\Tycoon;
 use App\Models\SubDealerTypes;
@@ -66,6 +67,11 @@ class PreSubController extends Controller
             $new_pre_or_sub_dealer='';
             $data=array('password'=>Hash::make($req->password), 'user_id'=>date('Y').date('m').date('d').Tycoon::all()->count());
             $new_pre_or_sub_dealer = Tycoon::create(array_merge($req->except('password'),$data));
+            
+            AdminWallet::where('admin_id', auth()->user()->id)->update(
+                ['product_balance' => DB::raw('product_balance-'. $req->opening_balance)]
+            );
+
             TycoonWallet::create(
                 [
                     'tycoon_id' => $new_pre_or_sub_dealer->id,
@@ -74,7 +80,7 @@ class PreSubController extends Controller
             );
 
             $new_transfer = BalanceTransfer::create([
-                'amount'=> $req->amount,
+                'amount'=> $req->opening_balance,
                 'payment_type'=> 3,
                 'status'=> 'APPROVED'
             ]);
@@ -108,16 +114,20 @@ class PreSubController extends Controller
     {
         $req->validate([
             'tycoon_id'=>'required|exists:tycoons,id',
-            'amount'=> 'required|numeric'
+            'amount'=> 'required|numeric',
+            'payment_type'=> 'required'
         ]);
-        if(Auth::user()->wallet && Auth::user()->wallet->product_balance < (float)$req->amount){
-            return $this->failed(null,'Insuficient product balance');
+
+        $balance_name = $req->payment_type == 1 ? 'product_balance' : 'marketing_balance';
+        if(Auth::user()->wallet && Auth::user()->wallet[$balance_name] < (float)$req->amount){
+            return $this->failed(null,'Insuficient balance.');
         }
+
         try{
 
             $new_transfer = BalanceTransfer::create([
                 'amount'=> $req->amount,
-                'payment_type'=> 1,
+                'payment_type'=> $req->payment_type,
                 'status'=> 'APPROVED'
             ]);
 
@@ -126,16 +136,24 @@ class PreSubController extends Controller
             // $new_transfer->transfer_to()->associate();
             $new_transfer->save();
 
-            TycoonWallet::updateOrInsert(
-                ['tycoon_id' => $req->tycoon_id],
-                ['product_balance' => DB::raw('product_balance+'. $req->amount)]
-            );
-
-            // DealerWallet::where('product_id', $product->id);
-            // ->update([
-            //   'count'=> DB::raw('count+1'), 
-            //   'last_count_increased_at' => Carbon::now()
-            // ]);
+            // add or distribute amount
+            if ($req->payment_type == 1) {
+                AdminWallet::where('admin_id', auth()->user()->id)->update(
+                    ['product_balance' => DB::raw('product_balance-'. $req->amount)]
+                );
+                TycoonWallet::updateOrInsert(
+                    ['tycoon_id' => $req->tycoon_id],
+                    ['product_balance' => DB::raw('product_balance+'. $req->amount)]
+                );
+            } else {
+                AdminWallet::where('admin_id', auth()->user()->id)->update(
+                    ['marketing_balance' => DB::raw('marketing_balance-'. $req->amount)]
+                );
+                TycoonWallet::updateOrInsert(
+                    ['tycoon_id' => $req->tycoon_id],
+                    ['marketing_balance' => DB::raw('marketing_balance+'. $req->amount)]
+                );
+            }
 
             return $this->success(TycoonWallet::with('tycoon')->where('tycoon_id',$req->tycoon_id)->first(), 'Tycoon wallet updated successfully');
         }

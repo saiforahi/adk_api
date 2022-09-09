@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\v1\admin\BalanceTransferController;
 use App\Http\Controllers\v1\admin\ProductStockOrderController;
 use App\Http\Controllers\v1\admin\TopUpRequestController;
 use Illuminate\Http\Request;
@@ -25,5 +26,10 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::group(['prefix' => 'topup-requests'], function () {
         Route::get('all/{type}', [TopUpRequestController::class, 'all_topup_requests']);
         Route::post('status/update', [TopUpRequestController::class, 'update_status']);
+    });
+
+    Route::group(['prefix' => 'transfer-history'], function () {
+        Route::get('all', [BalanceTransferController::class, 'index']);
+        Route::post('/add-balance', [BalanceTransferController::class, 'add_balance']);
     });
 });

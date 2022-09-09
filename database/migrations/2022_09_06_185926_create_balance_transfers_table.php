@@ -18,7 +18,7 @@ return new class extends Migration
             $table->nullableMorphs('transfer_from');
             $table->nullableMorphs('transfer_to');
             $table->float('amount', $precision = 19, $scale = 2);
-            $table->tinyInteger('payment_type');
+            $table->tinyInteger('payment_type')->default(1)->comment('1 = product balance, 2= marketing balance, 3=opening balance');
             $table->enum('status',['APPROVED','PENDING','PROCESSED'])->default('PENDING');
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
