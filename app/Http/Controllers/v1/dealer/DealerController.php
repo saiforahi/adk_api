@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\DealerRequest;
 use App\Models\Admin;
 use App\Models\AdminWallet;
+use App\Models\AdminStock;
 use App\Models\BalanceTransfer;
 use App\Models\Dealer;
 use App\Models\DealerProduct;
@@ -144,6 +145,16 @@ class DealerController extends Controller
                         'price'=> $product['price'],
                         'order_notes'=> 'null'
                     ]);
+                    if(strcasecmp($product['from'],'adk')){
+                        $admin_stock= AdminStock::where('product_id',$product['product_id'])->first();
+                        $admin_stock->quantity-=floatval($product['quantity']);
+                        $admin_stock->save();
+                    }
+                    else{
+                        $dealer_stock= DealerProductStock::where(['product_id'=>$product['product_id'],'dealer_id'=>$product['dealer_id']])->first();
+                        $dealer_stock->qty-=floatval($product['quantity']);
+                        $dealer_stock->save();
+                    }
                     $new_order->order_from()->associate(Auth::user());
                     $new_order->order_to()->associate(Admin::first());
                     // $new_order->order_to()->associate();
