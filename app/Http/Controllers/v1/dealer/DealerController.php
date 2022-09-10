@@ -46,9 +46,21 @@ class DealerController extends Controller
                     'product_balance' => $req->opening_balance
                 ],
             );
+
             AdminWallet::where('admin_id', auth()->user()->id)->update(
                 ['product_balance' => DB::raw('product_balance-'. $req->opening_balance)]
             );
+
+            // save transer history
+            $new_transfer = BalanceTransfer::create([
+                'amount'=> $req->opening_balance,
+                'payment_type'=> 3,
+                'status'=> 'APPROVED'
+            ]);
+            $new_transfer->transfer_from()->associate(Auth::user());
+            $new_transfer->transfer_to()->associate(Dealer::find($new_dealer->id));
+            $new_transfer->save();
+
             $images=array();
             if($req->hasFile('image') && $req->file('image')->isValid()){
                 array_push($images,$req->file('image'));
@@ -117,6 +129,7 @@ class DealerController extends Controller
 
     public function _product_stock_order(Request $req):JsonResponse
     {
+        DB::beginTransaction();
         try{
             $req->validate([
                 // 'dealer_id'=>'required|exists:dealers,id',
@@ -139,6 +152,8 @@ class DealerController extends Controller
                 DealerWallet::where('dealer_id',Auth::user()->id)->update([
                     'product_balance'=> Auth::user()->wallet->product_balance-(float)$req->totalAmount
                 ]);
+                DB:: commit();
+
                 return $this->success($req->all());
             }
             else{
@@ -147,6 +162,7 @@ class DealerController extends Controller
             
         }
         catch(Exception $e){
+            DB::rollback();
             return $this->failed(null, $e->getMessage(), 500);
         }
     }
@@ -172,7 +188,6 @@ class DealerController extends Controller
 
             $new_transfer->transfer_from()->associate(Auth::user());
             $new_transfer->transfer_to()->associate(Dealer::first());
-            // $new_transfer->transfer_to()->associate();
             $new_transfer->save();
 
             DealerWallet::updateOrInsert(
@@ -189,12 +204,13 @@ class DealerController extends Controller
             ]);
 
             $new_transfer->transfer_from()->associate(Auth::user());
-            $new_transfer->transfer_to()->associate(Dealer::first());
+            $new_transfer->transfer_to()->associate(Dealer::find($req->dealer_id));
             $new_transfer->save();
 
             return $this->success(DealerWallet::with('dealer')->where('dealer_id',$req->dealer_id)->first(), 'Dealer wallet updated successfully');
         }
         catch(Exception $e){
+            DB::rollback();
             return $this->failed(null, $e->getMessage(), 500);
         }
     }

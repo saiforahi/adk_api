@@ -27,9 +27,4 @@ Route::middleware(['auth:admin'])->group(function () {
         Route::get('all/{type}', [TopUpRequestController::class, 'all_topup_requests']);
         Route::post('status/update', [TopUpRequestController::class, 'update_status']);
     });
-
-    Route::group(['prefix' => 'transfer-history'], function () {
-        Route::get('all', [BalanceTransferController::class, 'index']);
-        Route::post('/add-balance', [BalanceTransferController::class, 'add_balance']);
-    });
 });

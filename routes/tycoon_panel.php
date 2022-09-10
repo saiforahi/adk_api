@@ -17,6 +17,7 @@ Route::prefix('tycoon')->group(function () {
 // top up requests
 Route::group(['prefix' => 'wallet'], function () {
     Route::post('/topup-request', [TycoonController::class,'submit_topup_request']);
+    Route::post('/add-balance', [TycoonController::class,'submit_topup_request']);
 });
 
 

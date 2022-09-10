@@ -25,29 +25,29 @@ class PreSubController extends Controller
         $this->middleware(['auth:admin'])->except([]);
         // $this->middleware('role:super-admin|unit-admin')->except([]);
     }
-    public function create_sub_dealer(PreSubDealerRequest $req){
-        try{
+    // public function create_sub_dealer(PreSubDealerRequest $req){
+    //     try{
             
-            $data=array('password'=>Hash::make($req->password), 'user_id'=>date('Y').date('m').date('d').Tycoon::all()->count());
-            $new_sub_dealer = Tycoon::create(array_merge($req->except('password'),$data));
+    //         $data=array('password'=>Hash::make($req->password), 'user_id'=>date('Y').date('m').date('d').Tycoon::all()->count());
+    //         $new_sub_dealer = Tycoon::create(array_merge($req->except('password'),$data));
           
-            return $new_sub_dealer;
-        }
-        catch(Exception $e){
-            return $e->getMessage();
-        }
-    }
-    public function create_pre_dealer(PreSubDealerRequest $req){
-        try{
-            // dd('working');
-            $data=array('password'=>Hash::make($req->password), 'user_id'=>date('Y').date('m').date('d').Tycoon::all()->count());
-            $new_pre_dealer = Tycoon::create(array_merge($req->except('password'),$data));
-            return $new_pre_dealer;
-        }
-        catch(Exception $e){
-            return $e->getMessage();
-        }
-    }
+    //         return $new_sub_dealer;
+    //     }
+    //     catch(Exception $e){
+    //         return $e->getMessage();
+    //     }
+    // }
+    // public function create_pre_dealer(PreSubDealerRequest $req){
+    //     try{
+    //         // dd('working');
+    //         $data=array('password'=>Hash::make($req->password), 'user_id'=>date('Y').date('m').date('d').Tycoon::all()->count());
+    //         $new_pre_dealer = Tycoon::create(array_merge($req->except('password'),$data));
+    //         return $new_pre_dealer;
+    //     }
+    //     catch(Exception $e){
+    //         return $e->getMessage();
+    //     }
+    // }
     public function _all_sub_dealer_types(){
         try{
             return $this->success(TycoonTypes::all());
@@ -61,7 +61,6 @@ class PreSubController extends Controller
         if(Auth::user()->wallet && Auth::user()->wallet->product_balance < (float)$req->opening_balance){
             return $this->failed(null,'Insuficient product balance');
         }
-
         DB::beginTransaction();
         try{
             $new_pre_or_sub_dealer='';
@@ -86,8 +85,7 @@ class PreSubController extends Controller
             ]);
 
             $new_transfer->transfer_from()->associate(Auth::user());
-            $new_transfer->transfer_to()->associate(Tycoon::first());
-            // $new_transfer->transfer_to()->associate();
+            $new_transfer->transfer_to()->associate(Tycoon::find($new_pre_or_sub_dealer->id));
             $new_transfer->save();
 
             $images=array();
@@ -122,7 +120,7 @@ class PreSubController extends Controller
         if(Auth::user()->wallet && Auth::user()->wallet[$balance_name] < (float)$req->amount){
             return $this->failed(null,'Insuficient balance.');
         }
-
+        DB::beginTransaction();
         try{
 
             $new_transfer = BalanceTransfer::create([
@@ -132,8 +130,7 @@ class PreSubController extends Controller
             ]);
 
             $new_transfer->transfer_from()->associate(Auth::user());
-            $new_transfer->transfer_to()->associate(Tycoon::first());
-            // $new_transfer->transfer_to()->associate();
+            $new_transfer->transfer_to()->associate(Tycoon::find($req->tycoon_id));
             $new_transfer->save();
 
             // add or distribute amount
@@ -154,10 +151,12 @@ class PreSubController extends Controller
                     ['marketing_balance' => DB::raw('marketing_balance+'. $req->amount)]
                 );
             }
+            DB::commit();
 
             return $this->success(TycoonWallet::with('tycoon')->where('tycoon_id',$req->tycoon_id)->first(), 'Tycoon wallet updated successfully');
         }
         catch(Exception $e){
+            DB::rollback();
             return $this->failed(null, $e->getMessage(), 500);
         }
     }
