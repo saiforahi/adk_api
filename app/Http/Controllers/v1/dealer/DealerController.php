@@ -145,7 +145,7 @@ class DealerController extends Controller
                         'price'=> $product['price'],
                         'order_notes'=> 'null'
                     ]);
-                    if(strcasecmp($product['from'],'adk')){
+                    if(strcasecmp($product['from'],"adk") == 0){
                         $admin_stock= AdminStock::where('product_id',$product['product_id'])->first();
                         $admin_stock->quantity-=floatval($product['quantity']);
                         $admin_stock->save();
