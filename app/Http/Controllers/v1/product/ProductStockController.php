@@ -115,12 +115,19 @@ class ProductStockController extends Controller
             
             switch($req->status){
                 case 'PROCESSED':
-                    $dealer_stock=DealerProductStock::create([
-                        'product_id'=> $order->product_id,
-                        'dealer_id'=> $order->order_from->id,
-                        'fk_order_id'=> $order->order_id,
-                        'qty'=> $order->qty
-                    ]);
+                    $stock= DealerProductStock::where(['product_id'=> $order->product_id,'dealer_id'=> $order->order_from->id])->first();
+                    if($stock){
+                        $stock->qty+= (int)$order->qty;
+                        $stock->save();
+                    }
+                    else{
+                        $dealer_stock=DealerProductStock::create([
+                            'product_id'=> $order->product_id,
+                            'dealer_id'=> $order->order_from->id,
+                            'qty'=> $order->qty,
+                            'fk_order_id'=> $order->order_id,   
+                        ]);
+                    }
                     break;
             }
             
