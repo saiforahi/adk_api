@@ -36,6 +36,16 @@ class OrderController extends Controller
                         'status'=> 'APPROVED',
                         'order_notes'=> 'null'
                     ]);
+                    if(strcasecmp($product['from'],'adk')){
+                        $admin_stock= AdminStock::where('product_id',$product['product_id'])->first();
+                        $admin_stock->quantity-=floatval($product['quantity']);
+                        $admin_stock->save();
+                    }
+                    else{
+                        $dealer_stock= DealerProductStock::where(['product_id'=>$product['product_id'],'dealer_id'=>$product['dealer_id']])->first();
+                        $dealer_stock->qty-= floatval($product['quantity']);
+                        $dealer_stock->save();
+                    }
                     $new_order->order_from()->associate(Auth::user());
                     $new_order->order_to()->associate(Admin::first());
                     $new_order->save();
@@ -64,7 +74,7 @@ class OrderController extends Controller
                 TycoonWallet::where('tycoon_id',Auth::user()->id)->update([
                     'product_balance'=> Auth::user()->wallet->product_balance-(float)$req->totalAmount
                 ]);
-                DB:: commit();
+                DB::commit();
                 return $this->success($req->all(), 'Order successfully completed.');
             }
             else{
