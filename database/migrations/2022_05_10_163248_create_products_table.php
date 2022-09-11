@@ -35,6 +35,7 @@ return new class extends Migration {
             $table->string('order_quantity_min')->nullable();
             $table->boolean('price_type')->nullable()->default(0);
             $table->double('unit_price', 8, 2)->nullable();
+            $table->double('mrp', 8, 2);
             $table->integer('currency_id')->nullable();
             $table->integer('quantity')->nullable();
             $table->longText('description')->nullable();

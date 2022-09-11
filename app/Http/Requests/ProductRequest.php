@@ -44,6 +44,7 @@ class ProductRequest extends FormRequest
             'sort_desc' => 'nullable',
             'property_options' => 'nullable',
             'unit' => 'nullable',
+            'mrp'=> 'required',
             'weight' => 'nullable',
             'height' => 'nullable',
             'length' => 'nullable',
