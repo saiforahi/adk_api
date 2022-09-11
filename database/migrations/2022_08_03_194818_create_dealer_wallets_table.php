@@ -16,8 +16,14 @@ return new class extends Migration
         Schema::create('dealer_wallets', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('dealer_id')->unique();
-            $table->float('product_balance', $precision = 19, $scale = 2);
             $table->foreign('dealer_id')->references('id')->on('dealers');
+            $table->float('total_income', $precision = 19, $scale = 2)->default(0);
+            $table->float('product_balance', $precision = 19, $scale = 2)->default(0);
+            $table->float('stock_balance', $precision = 19, $scale = 2)->default(0);
+            $table->float('sales_balance', $precision = 19, $scale = 2)->default(0);
+            $table->float('main_balance', $precision = 19, $scale = 2)->default(0);
+            $table->float('profit', $precision = 19, $scale = 2)->default(0);
+            $table->float('withwraw', $precision = 19, $scale = 2)->default(0);
             $table->timestamps();
         });
     }

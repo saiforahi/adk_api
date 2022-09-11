@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('tycoon_wallets', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('tycoon_id')->unique();
+            $table->float('main_balance', $precision = 19, $scale = 2)->default(0);
             $table->float('product_balance', $precision = 19, $scale = 2)->default(0);
             $table->float('marketing_balance', $precision = 19, $scale = 2)->default(0);
             $table->float('sales_commission', $precision = 19, $scale = 2)->default(0);
