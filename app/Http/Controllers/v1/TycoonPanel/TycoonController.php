@@ -6,6 +6,7 @@ use App\Events\v1\UploadImageEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TycoonPanel\TycoonRequest;
 use App\Http\Requests\WalletTopUpRequest;
+use App\Models\BalanceTransfer;
 use App\Models\TopupRequest;
 use App\Models\Tycoon;
 use App\Models\TycoonWallet;
@@ -28,7 +29,7 @@ class TycoonController extends Controller
     public function _all():JsonResponse
     {
         try{
-            return $this->success(Tycoon::where('reference_id', auth()->user()->id)->orWhere('reference_id', auth()->user()->reference_id)->select('tycoons.*', DB::raw('CONCAT(tycoons.first_name, " ", tycoons.last_name) AS name'
+            return $this->success(Tycoon::with('wallet:id,tycoon_id,product_balance')->where('reference_id', auth()->user()->id)->orWhere('reference_id', auth()->user()->reference_id)->select('tycoons.*', DB::raw('CONCAT(tycoons.first_name, " ", tycoons.last_name) AS name'
             ))->get());
         }
         catch(Exception $e){
@@ -38,21 +39,42 @@ class TycoonController extends Controller
     // tycoon store
     public function _store(TycoonRequest $req)
     {
+
+        if(Auth::user()->wallet && Auth::user()->wallet->marketing_balance < (float)$req->opening_balance){
+            return $this->failed(null,'Insuficient marketing balance');
+        }
+
+        DB::beginTransaction();
         try{
             $tycoon='';
-           
-     
             $data=array('password'=>Hash::make($req->password), 'user_id'=>date('Y').date('m').date('d').Tycoon::all()->count(), 'reference_id' => auth()->user()->id);
             $tycoon = Tycoon::create(array_merge($req->except('password'),$data));
-            $tycoon_wallet= TycoonWallet::create([
-                'tycoon_id'=>$tycoon->id
+            
+            TycoonWallet::updateOrInsert(
+                ['tycoon_id' => $tycoon->id],
+                ['product_balance' =>DB::raw('product_balance+'. $req->opening_balance)]
+            );
+
+            TycoonWallet::where('tycoon_id', auth()->user()->id)->update(
+                ['marketing_balance' => DB::raw('marketing_balance-'. $req->opening_balance)]
+            );
+
+            $new_transfer = BalanceTransfer::create([
+                'amount'=> $req->opening_balance,
+                'payment_type'=> 3,
+                'status'=> 'APPROVED'
             ]);
+
+            $new_transfer->transfer_from()->associate(Auth::user());
+            $new_transfer->transfer_to()->associate(Tycoon::first());
+            $new_transfer->save();
           
             $images=array();
             if($req->hasFile('image') && $req->file('image')->isValid()){
                 array_push($images,$req->file('image'));
             }
-            
+            DB:: commit();
+
             event(new UploadImageEvent($tycoon,$images,'image'));
             if($tycoon){
                 return $this->success($tycoon);
@@ -62,6 +84,7 @@ class TycoonController extends Controller
             }
         }
         catch(Exception $e){
+            DB::rollback();
             return $this->failed(null, $e->getMessage(), 500);
         }
     }

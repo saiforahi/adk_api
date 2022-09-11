@@ -34,11 +34,11 @@ class CommissionDistributionEventListener
         $tycoon_bonus = TycoonBonusConfig::get();
         $instant_sale = $tycoon_bonus->firstWhere('bonus_type', 'instant_sale')->bonus_percentage;
         $group_bonus = $tycoon_bonus->firstWhere('bonus_type', 'group_bonus')->bonus_percentage;
-        $adk_provident_fund = $tycoon_bonus->firstWhere('bonus_type', 'adk_provident_fund')->bonus_percentage;
-        $tycoon_provident_fund = $tycoon_bonus->firstWhere('bonus_type', 'tycoon_provident_fund')->bonus_percentage;
-        $dealer_ref_comm = $tycoon_bonus->firstWhere('bonus_type', 'dealer_ref_comm')->bonus_percentage;
-        $monthly_star_bonus = $tycoon_bonus->firstWhere('bonus_type', 'monthly_star_bonus')->bonus_percentage;
-        $monthly_sallary = $tycoon_bonus->firstWhere('bonus_type', 'monthly_sallary')->bonus_percentage;
+        // $adk_provident_fund = $tycoon_bonus->firstWhere('bonus_type', 'adk_provident_fund')->bonus_percentage;
+        // $tycoon_provident_fund = $tycoon_bonus->firstWhere('bonus_type', 'tycoon_provident_fund')->bonus_percentage;
+        // $dealer_ref_comm = $tycoon_bonus->firstWhere('bonus_type', 'dealer_ref_comm')->bonus_percentage;
+        // $monthly_star_bonus = $tycoon_bonus->firstWhere('bonus_type', 'monthly_star_bonus')->bonus_percentage;
+        // $monthly_sallary = $tycoon_bonus->firstWhere('bonus_type', 'monthly_sallary')->bonus_percentage;
        
         $data = $event->data;
         $amount = 0;
@@ -47,7 +47,7 @@ class CommissionDistributionEventListener
                 $this->instant_sale_distribution($data, $instant_sale);
             break;
             case 'group_bonus':
-                $this->group_bonus_distribution($data, $instant_sale);
+                $this->group_bonus_distribution($data, $group_bonus);
             break;
         }
     }
@@ -73,7 +73,7 @@ class CommissionDistributionEventListener
         foreach($tycoons as $tycoon) {
             if ($tycoon->user_id == $group_1->placement_id) {
                 array_push($this->datas, $tycoon);
-                $this->tycoon($tycoons, $tycoon);
+                // $this->tycoon($tycoons, $tycoon);
             }
         }
         $groupBonus= TycoonGroupBonusConfig::orderBy('group_no', 'asc')->get();

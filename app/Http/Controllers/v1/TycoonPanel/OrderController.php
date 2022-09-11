@@ -19,10 +19,8 @@ class OrderController extends Controller
 
     public function _store_order(Request $req)
     {
-
-
         DB::beginTransaction();
-
+        try{
             $req->validate([
                 'products'=> 'required'
             ]);
@@ -80,7 +78,11 @@ class OrderController extends Controller
             else{
                 return $this->failed(null,'Insuficient product balance');
             }
-
+        }
+        catch(Exception $e){
+            DB::rollback();
+            return $this->failed(null, $e->getMessage(), 500);
+        }
     }
 
     private function orderId () {

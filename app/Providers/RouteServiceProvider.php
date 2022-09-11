@@ -83,6 +83,10 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('api/tycoon-panel')
                 ->namespace($this->namespace)
                 ->group(base_path('routes/tycoon_panel.php'));
+            Route::middleware('api')
+                ->prefix('api/balance-transfer')
+                ->namespace($this->namespace)
+                ->group(base_path('routes/balance_transfer.php'));
         });
     }
 
