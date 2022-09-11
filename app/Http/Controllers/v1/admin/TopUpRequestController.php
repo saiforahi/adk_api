@@ -19,19 +19,22 @@ class TopUpRequestController extends Controller
     public function all_topup_requests($type){
         try{
             $requests=array();
-            switch($type){
-                case "dealer":
-                    $requests = TopUpRequest::with(['request_from'])->whereHasMorph('request_from',Dealer::class,function(Builder $query){
-                        $query->orderBy('created_at', 'desc');
-                    })->get();
-                    break;
+            $requests = TopUpRequest::with(['request_from'])->whereHasMorph('request_from',[Dealer::class,Tycoon::class],function(Builder $query){
+                $query->orderBy('created_at', 'desc');
+            })->get();
+            // switch($type){
+            //     case "dealer":
+            //         $requests = TopUpRequest::with(['request_from'])->whereHasMorph('request_from',Dealer::class,function(Builder $query){
+            //             $query->orderBy('created_at', 'desc');
+            //         })->get();
+            //         break;
 
-                case "tycoon":
-                    $requests = TopUpRequest::with(['request_from'])->whereHasMorph('request_from',Tycoon::class,function(Builder $query){
-                        $query->orderBy('created_at', 'desc');
-                    })->get();
-                    break;
-            }
+            //     case "tycoon":
+            //         $requests = TopUpRequest::with(['request_from'])->whereHasMorph('request_from',Tycoon::class,function(Builder $query){
+            //             $query->orderBy('created_at', 'desc');
+            //         })->get();
+            //         break;
+            // }
             
             return $this->success($requests, 'data', 200);
         }
@@ -65,9 +68,18 @@ class TopUpRequestController extends Controller
                         $dealer_wallet->save();
                     }
                     elseif($request->request_from_type=="App\Models\Tycoon"){
-                        $dealer_wallet=TycoonWallet::where('tycoon_id',$request->request_from->id)->first();
-                        $dealer_wallet->product_balance+=$request->amount;
-                        $dealer_wallet->save();
+                        $tycoon_wallet=TycoonWallet::where('tycoon_id',$request->request_from->id)->first();
+                        if($tycoon_wallet){
+                            $tycoon_wallet+=$request->amount;
+                            $tycoon_wallet->save();
+                        }
+                        else{
+                            TycoonWallet::create([
+                                'tycoon_id'=>$request->request_from->id,
+                                'product_balance'=>$request->amount
+                            ]);
+                        }
+                        
                     }
 
             }

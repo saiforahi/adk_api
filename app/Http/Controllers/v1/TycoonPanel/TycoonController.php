@@ -14,6 +14,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -139,6 +140,18 @@ class TycoonController extends Controller
         }
         catch (Exception $e){
             return $this->failed($e->getMessage(), $e->getMessage(), 500);
+        }
+    }
+
+    public function all_topup_request(){
+        try{
+            $requests = TopUpRequest::with(['request_from'])->whereHasMorph('request_from',Tycoon::class,function(Builder $query){
+                $query->orderBy('created_at', 'desc');
+            })->where('request_from_id',Auth::user()->id)->get();
+            return $this->success($requests, 'data', 200);
+        }
+        catch (Exception $e){
+            return $this->failed(null, $e->getMessage(), 500);
         }
     }
 }
