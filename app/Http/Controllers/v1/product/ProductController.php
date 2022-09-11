@@ -124,20 +124,47 @@ class ProductController extends Controller
         $product->makeHidden('media');
         return $product;
     }
+    protected function getStockImages($product)
+    {
+        $product['image'] = null;
+        $product->product->getMedia();
+        if ($product->product->media) {
+            $product->product->media->each(function ($item) use ($product) {
+                $product['image'] = $item->getFullUrl();
+            });
+        }
+        $product->makeHidden('media');
+        return $product;
+    }
+    protected function getDealerStockImages($dealer)
+    {
+        $dealer['image'] = null;
+        $dealer->product->getMedia();
+        if ($dealer->product->media) {
+            $dealer->product->media->each(function ($item) use ($dealer) {
+                $dealer['image'] = $item->getFullUrl();
+            });
+        }
+        $dealer->makeHidden('media');
+        return $dealer;
+    }
 
     public function stockable_product_list_dealer(){
         try{
-            $admin_stocks=AdminStock::with('product')->get()->toArray();
+            $admin_stocks=AdminStock::with('product')->get();
+            $admin_stocks = $admin_stocks->transform(function ($item) {
+                return $this->getStockImages($item);
+            });
             $dealer_stocks=[];
             $type=Auth::user()->dealer_type_id;
             if($type==1){
                 $dealer_stocks = [];
             }
             elseif($type==2){
-                $dealer_stocks=Dealer::with('stocked_products')->where('division_id',Auth::user()->division_id)->where('division_id','!=',null)->get()->toArray();
+                $dealer_stocks=Dealer::with('stocked_products')->where('division_id',Auth::user()->division_id)->where('division_id','!=',null)->get();
             }
             elseif($type==3){
-                $dealer_stocks=Dealer::with('stocked_products')->where('division_id',Auth::user()->district_id)->where('division_id','!=',null)->get()->toArray();
+                $dealer_stocks=Dealer::with('stocked_products')->where('district_id',Auth::user()->district_id)->where('division_id','!=',null)->get();
             }
             // swicth($type){
             //     case 1:
@@ -152,6 +179,14 @@ class ProductController extends Controller
             //     default:
             //         $dealer_stocks = [];
             // }
+
+            foreach ($dealer_stocks as $value) {
+                $stocked_products = $value->stocked_products->transform(function ($item) {
+                    return $this->getDealerStockImages($item);
+                });
+                $value->stocked_products = $stocked_products;
+            }
+
             $data=['ADK'=>$admin_stocks,'dealers'=>$dealer_stocks];
             return $this->success($data, 'Stockable product list for tycoon');  
         }
@@ -162,9 +197,18 @@ class ProductController extends Controller
 
     public function stockable_product_list_tycoon(){
         try{
-            $admin_stocks=AdminStock::with('product')->get()->toArray();
+            $admin_stocks=AdminStock::with('product')->get();
+            $admin_stocks = $admin_stocks->transform(function ($item) {
+                return $this->getStockImages($item);
+            });
+            $all_upazilla_dealers=Dealer::with('stocked_products')->where('dealer_type_id',DealerType::where('name','Upazilla Dealer')->first()->id)->get();
+            foreach ($all_upazilla_dealers as $value) {
+                $stocked_products = $value->stocked_products->transform(function ($item) {
+                    return $this->getDealerStockImages($item);
+                });
+                $value->stocked_products = $stocked_products;
+            }
             
-            $all_upazilla_dealers=Dealer::with('stocked_products')->where('dealer_type_id',DealerType::where('name','Upazilla Dealer')->first()->id)->get()->toArray();
             $data=['ADK'=>$admin_stocks,'dealers'=>$all_upazilla_dealers];
             return $this->success($data, 'Stockable product list for tycoon');
         }
