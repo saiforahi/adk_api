@@ -4,8 +4,8 @@ namespace App\Http\Controllers\v1\dealer;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\WalletTopUpRequest;
-use App\Models\TopUpRequest;
 use App\Models\Dealer;
+use App\Models\TopupRequest;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -17,7 +17,7 @@ class WalletController extends Controller
     //
     public function submit_topup_request(WalletTopUpRequest $req){
         try{
-            $new_request = TopUpRequest::create($req->all());
+            $new_request = TopupRequest::create($req->all());
             $new_request->request_from()->associate(Auth::user());
             if ($req->hasFile('document') && $req->file('document')->isValid()) {
                 $path = request()->file('document')->store('public/topup_request_docs');
@@ -34,7 +34,7 @@ class WalletController extends Controller
 
     public function all_topup_request(){
         try{
-            $requests = TopUpRequest::with(['request_from'])->whereHasMorph('request_from',Dealer::class,function(Builder $query){
+            $requests = TopupRequest::with(['request_from'])->whereHasMorph('request_from',Dealer::class,function(Builder $query){
                 $query->orderBy('created_at', 'desc');
             })->where('request_from_id',Auth::user()->id)->get();
             return $this->success($requests, 'data', 200);

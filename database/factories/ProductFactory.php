@@ -32,6 +32,7 @@ class ProductFactory extends Factory
             'height' => 10,
             'length' => 10,
             'width' => 10,
+            'mrp'=>100.02,
             'product_type' => 'product type',
             'colors' => 'red',
             'attributes' => 'attributes',
