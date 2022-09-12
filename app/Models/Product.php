@@ -24,6 +24,7 @@ class Product extends Model implements HasMedia
     use HasFactory, SoftDeletes, InteractsWithMedia;
 
     protected $guarded = [];
+    protected $with=["category","brand"];
     protected $casts = [
         'created_at'=>'datetime:Y-m-d h:i:s A',
         'updated_at'=>'datetime:Y-m-d h:i:s A',

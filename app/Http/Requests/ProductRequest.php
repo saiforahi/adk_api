@@ -58,6 +58,7 @@ class ProductRequest extends FormRequest
             'order_quantity_min' => 'nullable',
             'price_type' => 'nullable',
             'unit_price' => 'nullable',
+            'mrp' => 'nullable',
             'currency_id' => 'nullable',
             'quantity' => 'nullable',
             'description' => 'nullable',
