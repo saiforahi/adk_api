@@ -4,6 +4,7 @@ use App\Http\Controllers\v1\product\ProductController;
 use App\Http\Controllers\v1\TycoonPanel\TycoonController;
 use App\Http\Controllers\v1\TycoonPanel\OrderController;
 use App\Http\Controllers\v1\TycoonPanel\CommissionController;
+use App\Http\Controllers\v1\TycoonPanel\WalletController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('tycoon')->group(function () {
@@ -19,6 +20,10 @@ Route::group(['prefix' => 'wallet'], function () {
     Route::post('/topup-request', [TycoonController::class,'submit_topup_request']);
     Route::post('/add-balance', [TycoonController::class,'submit_topup_request']);
     Route::get('/topup-request/history', [TycoonController::class,'all_topup_request'])->middleware('auth:tycoon');
+    Route::get('/balance-process-history', [WalletController::class,'_all'])->middleware('auth:tycoon');
+    Route::post('/store-balance-process', [WalletController::class,'_store_balance_process'])->middleware('auth:tycoon');
+    Route::get('/withdraws', [WalletController::class,'_all_withdraw'])->middleware('auth:tycoon');
+    Route::post('/store-withdraw', [WalletController::class,'_store_withdraw'])->middleware('auth:tycoon');
 });
 
 

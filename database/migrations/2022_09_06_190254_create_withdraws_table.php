@@ -17,6 +17,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('tycoon_id');
             $table->float('amount', $precision = 19, $scale = 2);
+            $table->float('admin_pro_fund', $precision = 19, $scale = 2);
+            $table->float('tycoon_pro_fund', $precision = 19, $scale = 2);
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
             $table->foreign('tycoon_id')->references('id')->on('tycoons');

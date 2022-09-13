@@ -21,9 +21,9 @@ Route::resource('/product-stocks', ProductStockController::class);
 // product list global api
 Route::get('all', [ProductController::class, 'index']);
 
+Route::get('details/{product}', [ProductController::class, 'show']);
 Route::middleware(['auth:admin'])->group(function () {
     Route::delete('delete/{product}', [ProductController::class, 'destroy']);
     Route::post('create', [ProductController::class, 'store']);
-    Route::get('details/{product}', [ProductController::class, 'show']);
     Route::post('update/{product}', [ProductController::class, 'update']);
 });
