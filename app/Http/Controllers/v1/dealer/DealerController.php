@@ -165,7 +165,7 @@ class DealerController extends Controller
                 ]);
                 DB:: commit();
 
-                return $this->success($req->all());
+                return $this->success($req->all(), 'Product purchase successfully completed');
             }
             else{
                 return $this->failed(null,'Insuficient product balance');

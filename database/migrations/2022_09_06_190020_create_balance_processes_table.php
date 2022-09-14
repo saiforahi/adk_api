@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('balance_processes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('tycoon_id');
-            $table->tinyInteger('balance_type');
+            $table->string('balance_type');
             $table->float('amount', $precision = 19, $scale = 2);
             $table->timestamps();
             $table->softDeletes($column = 'deleted_at', $precision = 0);
