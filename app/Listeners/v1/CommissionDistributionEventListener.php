@@ -129,7 +129,8 @@ class CommissionDistributionEventListener
             'bonus_type' => $data['bonus_type'],
             'product_id' => $data['product_id'],
             'amount' => $amount,
-            'tycoon_id' => $data['tycoon_id']
+            'tycoon_id' => $data['tycoon_id'],
+            'from_tycoon_id' => $data['tycoon_id']
         ]);
     }
 }

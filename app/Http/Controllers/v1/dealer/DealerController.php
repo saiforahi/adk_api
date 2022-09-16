@@ -161,7 +161,7 @@ class DealerController extends Controller
                     $new_order->save();
                 }
                 DealerWallet::where('dealer_id',Auth::user()->id)->update([
-                    'product_balance'=> Auth::user()->wallet->product_balance-(float)$req->totalAmount
+                    'product_balance'=> Auth::user()->wallet->product_balance-(float)$req->totalAmount,
                 ]);
                 DB:: commit();
 

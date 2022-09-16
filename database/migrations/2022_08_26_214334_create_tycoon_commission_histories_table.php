@@ -15,12 +15,14 @@ return new class extends Migration
     {
         Schema::create('tycoon_commission_histories', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('tycoon_id')->nullable();
+            $table->unsignedBigInteger('from_tycoon_id')->nullable();
+            $table->unsignedBigInteger('to_tycoon_id')->nullable();
             $table->unsignedBigInteger('product_id');
             $table->string('bonus_type', 100);
             $table->float('amount', $precision = 19, $scale = 2);
             $table->tinyInteger('type')->default(2)->comment('1=admin, 2= tycoon');
-            $table->foreign('tycoon_id')->references('id')->on('tycoons');
+            $table->foreign('from_tycoon_id')->references('id')->on('tycoons');
+            $table->foreign('to_tycoon_id')->references('id')->on('tycoons');
             $table->foreign('product_id')->references('id')->on('products');
             $table->timestamps();
         });
