@@ -45,7 +45,7 @@ class CommissionController extends Controller
     public function _all_admin():JsonResponse
     {
         try{
-            $data = TycoonCommissionHistory::with('product:id,name','tycoon:id,first_name,last_name')->get();
+            $data = TycoonCommissionHistory::with('product:id,name','from_tycoon', 'to_tycoon')->get();
             return $this->success($data);
         }
         catch(Exception $e){

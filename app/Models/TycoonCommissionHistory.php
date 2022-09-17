@@ -11,9 +11,13 @@ class TycoonCommissionHistory extends Model
     protected $guarded=[];
 
 
-    public function tycoon()
+    public function from_tycoon()
     {
-        return $this->belongsTo(Tycoon::class);
+        return $this->belongsTo(Tycoon::class, 'from_tycoon_id');
+    }
+    public function to_tycoon()
+    {
+        return $this->belongsTo(Tycoon::class, 'to_tycoon_id');
     }
     public function product()
     {

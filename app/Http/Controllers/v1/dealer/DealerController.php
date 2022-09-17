@@ -138,6 +138,7 @@ class DealerController extends Controller
             ]);
             if(Auth::user()->wallet && Auth::user()->wallet->product_balance > (float)$req->totalAmount){
                 foreach($req->products as $product){
+
                     $new_order = ProductStockOrder::create([
                         'order_id'=>"1",
                         'product_id'=>$product['product_id'],
@@ -145,20 +146,30 @@ class DealerController extends Controller
                         'price'=> $product['price'],
                         'order_notes'=> 'null'
                     ]);
-                    if(strcasecmp($product['from'],"adk") == 0){
+                    if($product['from'] == 'adk'){
                         $admin_stock= AdminStock::where('product_id',$product['product_id'])->first();
+                        if ($admin_stock->quantity < $product['quantity']) {
+                            return $this->failed(null,'Not engounh quantity!');
+                        }
                         $admin_stock->quantity-=floatval($product['quantity']);
                         $admin_stock->save();
+
+                        $new_order->order_from()->associate(Auth::user());
+                        $new_order->order_to()->associate(Admin::first());
+                        $new_order->save();
                     }
                     else{
                         $dealer_stock= DealerProductStock::where(['product_id'=>$product['product_id'],'dealer_id'=>$product['dealer_id']])->first();
+                        if ($dealer_stock->qty < $product['quantity']) {
+                            return $this->failed(null,'Not engounh quantity!');
+                        }
                         $dealer_stock->qty-=floatval($product['quantity']);
                         $dealer_stock->save();
+
+                        $new_order->order_from()->associate(Auth::user());
+                        $new_order->order_to()->associate(Dealer::find($product['dealer_id']));
+                        $new_order->save();
                     }
-                    $new_order->order_from()->associate(Auth::user());
-                    $new_order->order_to()->associate(Admin::first());
-                    // $new_order->order_to()->associate();
-                    $new_order->save();
                 }
                 DealerWallet::where('dealer_id',Auth::user()->id)->update([
                     'product_balance'=> Auth::user()->wallet->product_balance-(float)$req->totalAmount,
@@ -181,7 +192,7 @@ class DealerController extends Controller
     public function _update_product_balance(Request $req):JsonResponse
     {
         $req->validate([
-            'dealer_id'=>'required|exists:dealers,id',
+            'dealer_id'=>'required',
             'amount'=> 'required|numeric'
         ]);
 
@@ -190,16 +201,6 @@ class DealerController extends Controller
         }
 
         try{
-
-            $new_transfer = BalanceTransfer::create([
-                'amount'=> $req->amount,
-                'payment_type'=> 1,
-                'status'=> 'APPROVED'
-            ]);
-
-            $new_transfer->transfer_from()->associate(Auth::user());
-            $new_transfer->transfer_to()->associate(Dealer::first());
-            $new_transfer->save();
 
             DealerWallet::updateOrInsert(
                 ['dealer_id' => $req->dealer_id],
@@ -210,7 +211,7 @@ class DealerController extends Controller
             );
             $new_transfer = BalanceTransfer::create([
                 'amount'=> $req->amount,
-                'payment_type'=> 3,
+                'payment_type'=> 1,
                 'status'=> 'APPROVED'
             ]);
 
@@ -228,7 +229,9 @@ class DealerController extends Controller
 
     public function product_stocks(){
         try{
-            $stocks=DealerProductStock::where('dealer_id',Auth::user()->id)->get();
+            $stocks=DealerProductStock::leftJoin('products', 'dealer_product_stocks.product_id', 'products.id')
+            ->select('dealer_product_stocks.*', 'products.name as product_name')
+            ->where('dealer_id',Auth::user()->id)->orderBy('dealer_product_stocks.id', 'desc')->get();
             return $this->success($stocks, 'Dealer Product stock list',200);
 
         }

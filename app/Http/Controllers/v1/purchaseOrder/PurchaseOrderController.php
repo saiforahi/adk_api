@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PurchaseOrderRequest;
 use App\Models\PurchaseOrder;
 use App\Models\AdminStock;
+use App\Models\AdminWallet;
 use App\Models\PurchaseOrderDetail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use DB;
+use Illuminate\Support\Facades\Auth;
+
 class PurchaseOrderController extends Controller
 {
     /**
@@ -29,10 +32,19 @@ class PurchaseOrderController extends Controller
      * @param PurchaseOrderRequest $request
      * @return JsonResponse
      */
-    public function store(PurchaseOrderRequest $request): JsonResponse
+    public function store(PurchaseOrderRequest $request)
     {
+
         DB::beginTransaction();
 
+        
+        $details = collect($request->details);
+        $total_amount = $details->sum('total_amount');
+
+        if(Auth::user()->wallet && Auth::user()->wallet->product_balance < (float)$total_amount){
+            return $this->failed(null,'Insuficient product balance');
+        }
+        
         try {
             $data = $this->purchaseOrderData($request);
             $purchaseOrder = PurchaseOrder::create($data);
@@ -52,6 +64,13 @@ class PurchaseOrderController extends Controller
                         ]);
                 }
             }
+            AdminWallet::updateOrInsert(
+                ['admin_id' => auth()->user()->id],
+                [
+                 'product_balance' => DB::raw('product_balance-'. $total_amount),
+                 'stock_balance' => DB::raw('stock_balance+'. $total_amount)
+                ],
+            );
             DB::commit();
 
             return $this->success($purchaseOrder);

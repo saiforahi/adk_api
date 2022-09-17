@@ -4,7 +4,7 @@ namespace App\Http\Controllers\v1\TycoonPanel;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductStockRequest;
-use App\Models\{ DealerProductStock, TycoonBonusConfig,TycoonGroupBonusConfig, AdminStock, TycoonWallet, Tycoon, ProductStockOrder, Admin};
+use App\Models\{ DealerProductStock, TycoonBonusConfig,TycoonGroupBonusConfig, AdminStock, TycoonWallet, Tycoon, ProductStockOrder, Admin, AdminWallet, Dealer, DealerWallet};
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -12,7 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Events\v1\CommissionDistributionEvent;
-
+use App\Events\v1\DealerCommissionDistributionEvent;
 use DB;
 class OrderController extends Controller
 {
@@ -34,26 +34,60 @@ class OrderController extends Controller
                         'status'=> 'APPROVED',
                         'order_notes'=> 'null'
                     ]);
-                    if(strcasecmp($product['from'],"adk") == 0){
+                    $total_amount = $product['quantity'] * $product['price'];
+
+                    if($product['from'] == "adk"){
                         $admin_stock= AdminStock::where('product_id',$product['product_id'])->first();
+                        if ($admin_stock->quantity < $product['quantity']) {
+                            return $this->failed(null,'Not engounh quantity!');
+                        }
                         $admin_stock->quantity-=floatval($product['quantity']);
                         $admin_stock->save();
-                    }
-                    else{
+
+                        $new_order->order_from()->associate(Auth::user());
+                        $new_order->order_to()->associate(Admin::first());
+                        $new_order->save();
+
+                        AdminWallet::where('admin_id', 1)->update([
+                            'stock_balance' => DB::raw('stock_balance-'. $total_amount),
+                            'total_sale' => DB::raw('total_sale+'. $total_amount)
+                        ]);
+
+                    } else {
                         $dealer_stock= DealerProductStock::where(['product_id'=>$product['product_id'],'dealer_id'=>$product['dealer_id']])->first();
+                        if ($dealer_stock->qty < $product['quantity']) {
+                            return $this->failed(null,'Not engounh quantity!');
+                        }
                         $dealer_stock->qty-= floatval($product['quantity']);
                         $dealer_stock->save();
+
+                        $new_order->order_from()->associate(Auth::user());
+                        $new_order->order_to()->associate(Dealer::find($product['dealer_id']));
+                        $new_order->save();
+                        
+                        DealerWallet::where('dealer_id', $product['dealer_id'])->update([
+                            'stock_balance' => DB::raw('stock_balance-'. $total_amount),
+                            'sales_balance' => DB::raw('sales_balance+'. $total_amount)
+                        ]);
+
+                        //bonus distribution
+                        $dealerbonus = [
+                            'product_id' => $product['product_id'],
+                            'amount' => $product['quantity'] * $product['price'],
+                            'tycoon_id' => auth()->user()->id,
+                            'from_dealer_id' => null,
+                            'to_dealer_id' => $product['dealer_id']
+                        ];
+                        event(new DealerCommissionDistributionEvent($dealerbonus));
                     }
-                    $new_order->order_from()->associate(Auth::user());
-                    $new_order->order_to()->associate(Admin::first());
-                    $new_order->save();
 
                     // bonus distribution
                     $bonus = [
                         'product_id' => $product['product_id'],
                         'bonus_type' => 'instant_sale',
                         'amount' => $product['quantity'] * $product['price'],
-                        'tycoon_id' => auth()->user()->reference_id ? auth()->user()->reference_id : 1,
+                        'from_tycoon_id' => auth()->user()->id,
+                        'to_tycoon_id' => auth()->user()->reference_id ? auth()->user()->reference_id : 1,
                         'placement_id' => auth()->user()->placement_id ? auth()->user()->placement_id : 1
                     ];
                     event(new CommissionDistributionEvent($bonus));
@@ -63,15 +97,16 @@ class OrderController extends Controller
                         'product_id' => $product['product_id'],
                         'bonus_type' => 'group_bonus',
                         'amount' => $product['quantity'] * $product['price'],
-                        'tycoon_id' => auth()->user()->reference_id ? auth()->user()->reference_id : 1,
+                        'to_tycoon_id' => auth()->user()->reference_id ? auth()->user()->reference_id : 1,
+                        'from_tycoon_id' => auth()->user()->id,
                         'placement_id' => auth()->user()->placement_id ? auth()->user()->placement_id : 1
                     ];
                     event(new CommissionDistributionEvent($bonus));
-
                 }
                 TycoonWallet::where('tycoon_id',Auth::user()->id)->update([
                     'product_balance'=> Auth::user()->wallet->product_balance-(float)$req->totalAmount
                 ]);
+
                 DB::commit();
                 return $this->success($req->all(), 'Order successfully completed.');
             }
