@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\v1\setting;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DealerCommissionRequest;
 use App\Models\DealerBonusConfig;
 use App\Models\TycoonGroupBonusConfig;
 use App\Models\TycoonStarMonthlyBonusConfig;
 use App\Models\TycoonBonusConfig;
+use App\Models\TycoonCommissionHistory;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -39,9 +41,19 @@ class CommissionController extends Controller
             return $this->failed(null, $e->getMessage(), 500);
         }
     }
-
+    //all commission history for admin
+    public function _all_admin():JsonResponse
+    {
+        try{
+            $data = TycoonCommissionHistory::with('product:id,name','from_tycoon', 'to_tycoon')->get();
+            return $this->success($data);
+        }
+        catch(Exception $e){
+            return $this->failed(null, $e->getMessage(), 500);
+        }
+    }
     // update supplier details
-    public function _update(DealerCommission $dealerCommission, DealerCommissionRequest $req):JsonResponse
+    public function _update(DealerCommissionRequest $dealerCommission, DealerCommissionRequest $req):JsonResponse
     {
         try{
             $data = [];

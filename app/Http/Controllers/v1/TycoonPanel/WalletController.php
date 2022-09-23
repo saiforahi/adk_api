@@ -109,7 +109,11 @@ class WalletController extends Controller
 
             TycoonWallet::updateOrInsert(
                 ['tycoon_id' => auth()->user()->id],
-                ['main_balance' => DB::raw('main_balance-'. $req->amount), 'provident_fund' => DB::raw('provident_fund+'. $tycoon_pro_fund)]
+                [
+                    'main_balance' => DB::raw('main_balance-'. $req->amount),
+                    'provident_fund' => DB::raw('provident_fund+'. $tycoon_pro_fund),
+                    'withdraw' => DB::raw('withdraw+'. $req->amount)
+                ]
             );
 
             AdminWallet::updateOrInsert(

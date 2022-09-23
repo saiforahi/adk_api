@@ -26,7 +26,13 @@ class PurchaseOrderRequest extends FormRequest
     public function rules()
     {
         return [
-            'po_no' => 'required',
+            'po_no' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('purchase_orders')
+                    ->ignore($this->purchaseOrder)
+            ],
             'purchase_date' => 'required',
             'supplier_id' => 'required',
             'warehouse_id' => 'required',

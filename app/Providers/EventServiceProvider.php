@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use App\Events\v1\UploadImageEvent;
 use App\Events\v1\CommissionDistributionEvent;
+use App\Events\v1\DealerCommissionDistributionEvent;
 use App\Listeners\v1\UploadImageEventListener;
 use App\Listeners\v1\CommissionDistributionEventListener;
+use App\Listeners\v1\DealerCommissionDistributionListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -27,6 +29,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         CommissionDistributionEvent::class => [
             CommissionDistributionEventListener::class,
+        ],
+        DealerCommissionDistributionEvent::class => [
+            DealerCommissionDistributionListener::class,
         ],
     ];
 

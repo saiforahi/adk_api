@@ -63,17 +63,16 @@ class CommissionDistributionEventListener
             $masterTycoon = AdminWallet::first();
             $masterTycoon->tycoon_group_commission_gap = $masterTycoon->tycoon_group_commission_gap + $toal_bonus;
             $masterTycoon->save();
-            $data['tycoon_id'] = 1;
+            $data['to_tycoon_id'] = 1;
             $data['type'] = 1;
             $this->storeBonudHistory($data, $toal_bonus);
             return true;
         }
-
         array_push($this->datas, $group_1);
         foreach($tycoons as $tycoon) {
             if ($tycoon->user_id == $group_1->placement_id) {
                 array_push($this->datas, $tycoon);
-                // $this->tycoon($tycoons, $tycoon);
+                $this->tycoon($tycoons, $tycoon);
             }
         }
         $groupBonus= TycoonGroupBonusConfig::orderBy('group_no', 'asc')->get();
@@ -81,8 +80,8 @@ class CommissionDistributionEventListener
         foreach($this->datas as $key=>$value) {
             if(20 > $key) {
                 $amount = ($toal_bonus * $groupBonus[$key]->bonus_percentage) / 100;
-                $this->updateWallet('group_commission', $amount, $data['tycoon_id']);
-                $data['tycoon_id'] = $value->id;
+                $this->updateWallet('group_commission', $amount,  $value->id);
+                $data['to_tycoon_id'] = $value->id;
                 $this->storeBonudHistory($data, $amount);
                 $total_pay += $amount;
             }
@@ -110,7 +109,7 @@ class CommissionDistributionEventListener
     // instant sale distribution here
     private function instant_sale_distribution($data = [], $percentage = 0) :void {
         $amount = ($data['amount'] * $percentage) / 100;
-        $this->updateWallet('sales_commission', $amount, $data['tycoon_id']);
+        $this->updateWallet('sales_commission', $amount, $data['to_tycoon_id']);
         $this->storeBonudHistory($data, $amount);
     }
 
@@ -129,7 +128,8 @@ class CommissionDistributionEventListener
             'bonus_type' => $data['bonus_type'],
             'product_id' => $data['product_id'],
             'amount' => $amount,
-            'tycoon_id' => $data['tycoon_id']
+            'to_tycoon_id' => $data['to_tycoon_id'],
+            'from_tycoon_id' => $data['from_tycoon_id']
         ]);
     }
 }

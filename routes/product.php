@@ -16,7 +16,7 @@ Route::post('/products/{product}', [ProductController::class, 'update']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
 
 Route::post('/product-stocks/{product}', [ProductStockController::class, 'update']);
-Route::resource('/product-stocks', ProductStockController::class);
+Route::resource('/product-stocks', ProductStockController::class)->middleware('auth:admin');
 
 // product list global api
 Route::get('all', [ProductController::class, 'index']);
