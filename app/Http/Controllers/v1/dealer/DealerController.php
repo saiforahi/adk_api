@@ -134,7 +134,8 @@ class DealerController extends Controller
         try{
             $req->validate([
                 // 'dealer_id'=>'required|exists:dealers,id',
-                'products'=> 'required'
+                'products'=> 'required',
+                'totalAmount'=>'required'
             ]);
             if(Auth::user()->wallet && Auth::user()->wallet->product_balance > (float)$req->totalAmount){
                 foreach($req->products as $product){
@@ -153,6 +154,9 @@ class DealerController extends Controller
                         }
                         $admin_stock->quantity-=floatval($product['quantity']);
                         $admin_stock->save();
+                        if($admin_stock->quantity == 0){
+                            $admin_stock->delete();
+                        }
 
                         $new_order->order_from()->associate(Auth::user());
                         $new_order->order_to()->associate(Admin::first());
@@ -165,6 +169,9 @@ class DealerController extends Controller
                         }
                         $dealer_stock->qty-=floatval($product['quantity']);
                         $dealer_stock->save();
+                        if($dealer_stock->quantity == 0){
+                            $dealer_stock->delete();
+                        }
 
                         $new_order->order_from()->associate(Auth::user());
                         $new_order->order_to()->associate(Dealer::find($product['dealer_id']));

@@ -27,6 +27,10 @@ class Dealer extends Authenticatable implements HasMedia,MustVerifyEmail
         'updated_at'=>'datetime:Y-m-d h:i:s A',
         'deleted_at'=>'datetime:Y-m-d h:i:s A'
     ];
+    // returning type
+    public function type(){
+        return $this->hasOne(DealerType::class);
+    }
     // returning guard name
     public function guard__name(){
         return $this->guard_name;

@@ -9,14 +9,15 @@ use App\Models\Dealer;
 use App\Models\DealerProductStock;
 use App\Models\AdminStock;
 use App\Models\DealerWallet;
+use App\Models\ProductStock;
 use App\Models\ProductStockOrder;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use DB;
+use Illuminate\Support\Facades\DB as FacadesDB;
+
 class ProductStockController extends Controller
 {
     /**
@@ -25,7 +26,7 @@ class ProductStockController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $stocks = AdminStock::leftJoin('products', 'admin_stocks.product_id', 'products.id')
+        $stocks = AdminStock::leftJoin('products', 'admin_stocks.product_id', 'products.id')->where('admin_stocks.quantity','!=',0)
         ->select('admin_stocks.*', 'products.name as product_name')
         ->latest()->get();
         return $this->success($stocks);
@@ -114,8 +115,7 @@ class ProductStockController extends Controller
     }
     public function product_stock_order_status_update(Request $req): JsonResponse
     {
-
-        DB::beginTransaction();
+        FacadesDB::beginTransaction();
         try{
             $req->validate([
                 'order_id'=>'required',
@@ -143,7 +143,7 @@ class ProductStockController extends Controller
                         }
                         DealerWallet::updateOrInsert(
                             ['dealer_id' => $order->order_from->id],
-                            ['stock_balance' => DB::raw('stock_balance+'. ($order->price * $order->qty))]
+                            ['stock_balance' => FacadesDB::raw('stock_balance+'. ($order->price * $order->qty))]
                         );
                          //bonus distribution
                         $bonus = [
@@ -166,39 +166,16 @@ class ProductStockController extends Controller
                 $total_sale_amount = ($order->price * $order->qty);
                 DealerWallet::where('dealer_id', auth()->user()->id)->update(
                     [
-                        'stock_balance' => DB::raw('stock_balance-'.$total_sale_amount),
-                        'sales_balance' => DB::raw('sales_balance+'.$total_sale_amount)
+                        'stock_balance' => FacadesDB::raw('stock_balance-'.$total_sale_amount),
+                        'sales_balance' => FacadesDB::raw('sales_balance+'.$total_sale_amount)
                     ]
                 );
             }
-            DB:: commit();
-
-            // $order=ProductStockOrder::findOrFail($req->order_id);
-            // $order->status=$req->status;
-            // $order->save();
-            
-            // switch($req->status){
-            //     case 'PROCESSED':
-            //         $stock= DealerProductStock::where(['product_id'=> $order->product_id,'dealer_id'=> $order->order_from->id])->first();
-            //         if($stock){
-            //             $stock->qty+= (int)$order->qty;
-            //             $stock->save();
-            //         }
-            //         else{
-            //             $dealer_stock=DealerProductStock::create([
-            //                 'product_id'=> $order->product_id,
-            //                 'dealer_id'=> $order->order_from->id,
-            //                 'qty'=> $order->qty,
-            //                 'fk_order_id'=> $order->order_id,   
-            //             ]);
-            //         }
-            //     break;
-            // }
-            
+            FacadesDB:: commit();
             return $this->success($order, 'Product Stock order status updated',200);
         }
         catch(Exception $e){
-            DB::rollback();
+            FacadesDB::rollback();
             return $this->failed(null, $e->getMessage(), 500);
         }
     }

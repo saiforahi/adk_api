@@ -10,6 +10,7 @@ use App\Models\AdminStock;
 use App\Models\AdminWallet;
 use App\Models\Dealer;
 use App\Models\DealerProductStock;
+use App\Models\DealerType;
 use App\Models\DealerWallet;
 use App\Models\ProductStockOrder;
 use Exception;
@@ -32,6 +33,33 @@ class ProductStockOrderController extends Controller
             $orders = ProductStockOrder::with(['product','order_to','order_from'])->whereHasMorph('order_to',Admin::class,function(Builder $query){
                 $query->where('id', '=', Auth::user()->id);
             })->get();
+            foreach($orders as $history){
+                switch($history->order_from_type){
+                    case 'App\Models\Dealer':
+                        $history['order_from']['from_type']='Dealer';
+                        $history['order_from']['dealer_type']=DealerType::where('id',$history->order_from['dealer_type_id'])->first()->name;
+                        break;
+                    case 'App\Models\Admin':
+                        $history['order_from']['from_type']='Admin';break;
+                    case 'App\Models\Tycoon':
+                        $history['order_from']['from_type']='Tycoon';break;
+                    case 'App\Models\MasterTycoon':
+                        $history['order_from']['from_type']='Master Tycoon';break;
+                }
+                switch($history->order_to_type){
+                    case 'App\Models\Dealer':
+                        $history['order_to']['to_type']='Dealer';
+                        $history['order_to']['dealer_type']=DealerType::where('id',$history->order_to['dealer_type_id'])->first()->name;
+                        break;
+                    case 'App\Models\Admin':
+                        $history['order_to']['to_type']='Admin';break;
+                    case 'App\Models\Tycoon':
+                        $history['order_to']['to_type']='Tycoon';break;
+                    case 'App\Models\MasterTycoon':
+                        $history['order_to']['to_type']='Master Tycoon';break;
+                }
+
+            }
             return $this->success($orders, 'Product Stock order requests',200);
         }
         catch(Exception $e){

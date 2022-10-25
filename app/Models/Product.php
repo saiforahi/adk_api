@@ -85,4 +85,8 @@ class Product extends Model implements HasMedia
     {
 
     }
+    public function images()
+    {
+        return $this->getMedia();
+    }
 }

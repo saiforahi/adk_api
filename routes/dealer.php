@@ -28,6 +28,6 @@ Route::middleware('auth:dealer')->group(function () {
     });
     Route::group(['prefix' => 'wallet'], function () {
         Route::post('/topup-request', [WalletController::class,'submit_topup_request']);
-        Route::post('/topup-request/history', [WalletController::class,'all_topup_request']);
+        Route::get('/topup-request/history', [WalletController::class,'all_topup_request']);
     });
 });

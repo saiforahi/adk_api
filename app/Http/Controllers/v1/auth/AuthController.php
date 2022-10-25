@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\v1\auth;
 
-use Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Exception;
+use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
@@ -78,6 +78,41 @@ class AuthController extends Controller
                 'message'=> 'Registration Successful',
                 'data' => $user,
             ], 201);
+        }
+        catch (Exception $e){
+            return response()->json([
+                'success' => false,
+                'message' => 'User registration failed!',
+            ], 500);
+        }
+    }
+    public function change_password(Request $request) {
+        $validator=Validator::make($request->all(),[
+            'old_password'=>'required|string|min:8',
+            'new_password'=>'required|string|min:8'
+        ]);
+        if($validator->fails()){                                            //validating general registration rules
+            return response()->json(['success'=>false,'errors'=>$validator->errors()], 422);
+        }
+
+        try{
+            $user = FacadesAuth::user();
+            if(Hash::check($request->old_password,$user->password)){
+                $user->password = Hash::make($request->new_password);
+                $user->save();
+            }
+            else{
+                return response()->json([
+                    'success' => false,
+                    'message'=> 'Wrong password',
+                ], 200);
+            }
+           
+            return response()->json([
+                'success' => true,
+                'message'=> 'Password changed Successfully',
+                'data' => $user,
+            ], 200);
         }
         catch (Exception $e){
             return response()->json([

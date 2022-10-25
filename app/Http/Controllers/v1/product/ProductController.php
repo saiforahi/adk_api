@@ -127,8 +127,7 @@ class ProductController extends Controller
     protected function getStockImages($product)
     {
         $product['image'] = null;
-        $product->product->getMedia();
-        if ($product->product->media) {
+        if (count($product->product->getMedia())>0) {
             $product->product->media->each(function ($item) use ($product) {
                 $product['image'] = $item->getFullUrl();
             });
@@ -139,7 +138,6 @@ class ProductController extends Controller
     protected function getDealerStockImages($dealer)
     {
         $dealer['image'] = null;
-        $dealer->product->getMedia();
         if ($dealer->product->media) {
             $dealer->product->media->each(function ($item) use ($dealer) {
                 $dealer['image'] = $item->getFullUrl();
@@ -151,10 +149,10 @@ class ProductController extends Controller
 
     public function stockable_product_list_dealer(){
         try{
-            $admin_stocks=AdminStock::with('product')->get();
-            $admin_stocks = $admin_stocks->transform(function ($item) {
-                return $this->getStockImages($item);
-            });
+            $admin_stocks=AdminStock::with(['product','product.media'])->get();
+            // $admin_stocks = $admin_stocks->transform(function ($item) {
+            //     return $this->getStockImages($item);
+            // });
             $dealer_stocks=[];
             $type=Auth::user()->dealer_type_id;
             if($type==1){
@@ -197,17 +195,14 @@ class ProductController extends Controller
 
     public function stockable_product_list_tycoon(){
         try{
-            $admin_stocks=AdminStock::with('product')->get();
-            $admin_stocks = $admin_stocks->transform(function ($item) {
-                return $this->getStockImages($item);
-            });
-            $all_upazilla_dealers=Dealer::with('stocked_products')->where('dealer_type_id',DealerType::where('name','Upazilla Dealer')->first()->id)->get();
-            foreach ($all_upazilla_dealers as $value) {
-                $stocked_products = $value->stocked_products->transform(function ($item) {
-                    return $this->getDealerStockImages($item);
-                });
-                $value->stocked_products = $stocked_products;
-            }
+            $admin_stocks=AdminStock::with(['product','product.media'])->get();
+            $all_upazilla_dealers=Dealer::with(['stocked_products','stocked_products.product.media'])->where('dealer_type_id',DealerType::where('name','Upazilla Dealer')->first()->id)->get();
+            // foreach ($all_upazilla_dealers as $value) {
+            //     $stocked_products = $value->stocked_products->transform(function ($item) {
+            //         return $this->getDealerStockImages($item);
+            //     });
+            //     $value->stocked_products = $stocked_products;
+            // }
             
             $data=['ADK'=>$admin_stocks,'dealers'=>$all_upazilla_dealers];
             return $this->success($data, 'Stockable product list for tycoon');

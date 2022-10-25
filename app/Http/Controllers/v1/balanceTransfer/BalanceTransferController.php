@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\AdminWallet;
 use App\Models\BalanceTransfer;
+use App\Models\Dealer;
+use App\Models\DealerType;
 use App\Models\Tycoon;
 use App\Models\TycoonWallet;
 use Exception;
@@ -19,7 +21,35 @@ class BalanceTransferController extends Controller
     //
     public function index(Request $request){
         try{
-            return $this->success(BalanceTransfer::with(['transfer_to','transfer_from'])->get());
+            $histories = BalanceTransfer::with(['transfer_to','transfer_from'])->get();
+            foreach($histories as $history){
+                switch($history->transfer_from_type){
+                    case 'App\Models\Dealer':
+                        $history['transfer_from']['from_type']='Dealer';
+                        $history['transfer_from']['dealer_type']=DealerType::where('id',$history->transfer_from['dealer_type_id'])->first()->name;
+                        break;
+                    case 'App\Models\Admin':
+                        $history['transfer_from']['from_type']='Admin';break;
+                    case 'App\Models\Tycoon':
+                        $history['transfer_from']['from_type']='Tycoon';break;
+                    case 'App\Models\MasterTycoon':
+                        $history['transfer_from']['from_type']='Master Tycoon';break;
+                }
+                switch($history->transfer_to_type){
+                    case 'App\Models\Dealer':
+                        $history['transfer_to']['to_type']='Dealer';
+                        $history['transfer_to']['dealer_type']=DealerType::where('id',$history->transfer_to['dealer_type_id'])->first()->name;
+                        break;
+                    case 'App\Models\Admin':
+                        $history['transfer_to']['to_type']='Admin';break;
+                    case 'App\Models\Tycoon':
+                        $history['transfer_to']['to_type']='Tycoon';break;
+                    case 'App\Models\MasterTycoon':
+                        $history['transfer_to']['to_type']='Master Tycoon';break;
+                }
+
+            }
+            return $this->success($histories);
         }
         catch(Exception $e){
             return $this->failed(null, $e->getMessage(), 500);

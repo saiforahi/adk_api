@@ -44,11 +44,11 @@ class DealerCommissionDistributionListener
         DealerWallet::where('dealer_id', $data['to_dealer_id'])->update([
             'profit' => DB::raw('profit+'. $toal_bonus)
         ]);
-        $this->storeBonudHistory($data, $toal_bonus);
+        $this->storeBonusHistory($data, $toal_bonus);
     }
 
     // store commission history
-    private function storeBonudHistory($data, $amount=0) :void {
+    private function storeBonusHistory($data, $amount=0) :void {
         DealerCommission::create([
             'product_id' => $data['product_id'],
             'amount' => $amount,
