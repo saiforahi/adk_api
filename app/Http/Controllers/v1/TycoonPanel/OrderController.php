@@ -4,7 +4,7 @@ namespace App\Http\Controllers\v1\TycoonPanel;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductStockRequest;
-use App\Models\{ DealerProductStock, TycoonBonusConfig,TycoonGroupBonusConfig, AdminStock, TycoonWallet, Tycoon, ProductStockOrder, Admin, AdminWallet, Dealer, DealerWallet};
+use App\Models\{ DealerProductStock, TycoonBonusConfig,TycoonGroupBonusConfig, AdminStock, TycoonWallet, Tycoon, ProductStockOrder, Admin, AdminWallet, Dealer, DealerWallet, ProductStock};
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -13,7 +13,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Events\v1\CommissionDistributionEvent;
 use App\Events\v1\DealerCommissionDistributionEvent;
-use DB;
+use Illuminate\Support\Facades\DB;
+
 class OrderController extends Controller
 {
 
@@ -43,6 +44,9 @@ class OrderController extends Controller
                         }
                         $admin_stock->quantity-=floatval($product['quantity']);
                         $admin_stock->save();
+                        // if($admin_stock->quantity == 0){
+                        //     $admin_stock->delete();
+                        // }
 
                         $new_order->order_from()->associate(Auth::user());
                         $new_order->order_to()->associate(Admin::first());
@@ -60,6 +64,9 @@ class OrderController extends Controller
                         }
                         $dealer_stock->qty-= floatval($product['quantity']);
                         $dealer_stock->save();
+                        // if($dealer_stock->quantity == 0){
+                        //     $dealer_stock->delete();
+                        // }
 
                         $new_order->order_from()->associate(Auth::user());
                         $new_order->order_to()->associate(Dealer::find($product['dealer_id']));
