@@ -83,7 +83,7 @@ class WarehouseController extends Controller
                 $item->delete();
             });
         }
-        $warehouse->delete();
+        $warehouse->forceDelete();
         return $this->success($warehouse, 'Warehouse Deleted Successfully');
     }
 

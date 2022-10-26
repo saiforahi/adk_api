@@ -25,12 +25,7 @@ class WarehouseRequest extends FormRequest
     public function rules()
     {
         return [
-            'code' => [
-                'required',
-                Rule::unique('warehouses')
-                    ->ignore($this->warehouse)
-                    ->whereNull('deleted_at')
-            ],
+            'code' => ['required','unique:warehouses,code'],
             'name' => 'required',
             'address' => 'required',
             'capacity' => 'required',
