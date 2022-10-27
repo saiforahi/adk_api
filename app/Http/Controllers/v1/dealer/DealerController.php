@@ -128,6 +128,7 @@ class DealerController extends Controller
         return $this->success($dealer, 'Dealer Deleted Successfully');
     }
 
+    // dealer stock order submit API
     public function _product_stock_order(Request $req):JsonResponse
     {
         DB::beginTransaction();
@@ -157,7 +158,6 @@ class DealerController extends Controller
                         if($admin_stock->quantity == 0){
                             $admin_stock->delete();
                         }
-
                         $new_order->order_from()->associate(Auth::user());
                         $new_order->order_to()->associate(Admin::first());
                         $new_order->save();
@@ -181,8 +181,7 @@ class DealerController extends Controller
                 DealerWallet::where('dealer_id',Auth::user()->id)->update([
                     'product_balance'=> Auth::user()->wallet->product_balance-(float)$req->totalAmount,
                 ]);
-                DB:: commit();
-
+                DB::commit();
                 return $this->success($req->all(), 'Product purchase successfully completed');
             }
             else{
@@ -202,13 +201,10 @@ class DealerController extends Controller
             'dealer_id'=>'required',
             'amount'=> 'required|numeric'
         ]);
-
         if(Auth::user()->wallet && Auth::user()->wallet->product_balance < (float)$req->opening_balance){
             return $this->failed(null,'Insuficient product balance');
         }
-
         try{
-
             DealerWallet::updateOrInsert(
                 ['dealer_id' => $req->dealer_id],
                 ['product_balance' =>DB::raw('product_balance+'. $req->amount)]
@@ -221,11 +217,9 @@ class DealerController extends Controller
                 'payment_type'=> 1,
                 'status'=> 'APPROVED'
             ]);
-
             $new_transfer->transfer_from()->associate(Auth::user());
             $new_transfer->transfer_to()->associate(Dealer::find($req->dealer_id));
             $new_transfer->save();
-
             return $this->success(DealerWallet::with('dealer')->where('dealer_id',$req->dealer_id)->first(), 'Dealer wallet updated successfully');
         }
         catch(Exception $e){
@@ -240,7 +234,6 @@ class DealerController extends Controller
             ->select('dealer_product_stocks.*', 'products.name as product_name')
             ->where('dealer_id',Auth::user()->id)->orderBy('dealer_product_stocks.id', 'desc')->get();
             return $this->success($stocks, 'Dealer Product stock list',200);
-
         }
         catch (Exception $e){
             return $this->failed(null, $e->getMessage(), 500);

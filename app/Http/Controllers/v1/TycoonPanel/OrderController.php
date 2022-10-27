@@ -4,7 +4,7 @@ namespace App\Http\Controllers\v1\TycoonPanel;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductStockRequest;
-use App\Models\{ DealerProductStock, TycoonBonusConfig,TycoonGroupBonusConfig, AdminStock, TycoonWallet, Tycoon, ProductStockOrder, Admin, AdminWallet, Dealer, DealerWallet, ProductStock};
+use App\Models\{ DealerProductStock, TycoonBonusConfig,TycoonGroupBonusConfig, AdminStock, TycoonWallet, Tycoon, ProductStockOrder, Admin, AdminWallet, Dealer, DealerBonusConfig, DealerWallet, ProductStock};
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -20,7 +20,7 @@ class OrderController extends Controller
 
     public function _store_order(Request $req)
     {
-        DB::beginTransaction();
+        // DB::beginTransaction();
         try{
             $req->validate([
                 'products'=> 'required'
@@ -43,18 +43,20 @@ class OrderController extends Controller
                             return $this->failed(null,'Not engounh quantity!');
                         }
                         $admin_stock->quantity-=floatval($product['quantity']);
-                        $admin_stock->save();
-                        // if($admin_stock->quantity == 0){
-                        //     $admin_stock->delete();
-                        // }
+                        
+                        if($admin_stock->quantity == 0){
+                            $admin_stock->delete();
+                        }else{
+                            $admin_stock->save();
+                        }
 
                         $new_order->order_from()->associate(Auth::user());
                         $new_order->order_to()->associate(Admin::first());
                         $new_order->save();
-
+                        // admin profit
                         AdminWallet::where('admin_id', 1)->update([
                             'stock_balance' => DB::raw('stock_balance-'. $total_amount),
-                            'total_sale' => DB::raw('total_sale+'. $total_amount)
+                            'total_sale' => DB::raw('total_sale+'. $total_amount),
                         ]);
 
                     } else {
@@ -63,10 +65,12 @@ class OrderController extends Controller
                             return $this->failed(null,'Not engounh quantity!');
                         }
                         $dealer_stock->qty-= floatval($product['quantity']);
-                        $dealer_stock->save();
-                        // if($dealer_stock->quantity == 0){
-                        //     $dealer_stock->delete();
-                        // }
+                        if($dealer_stock->qty == 0){
+                            $dealer_stock->delete();
+                        }
+                        else{
+                            $dealer_stock->save();
+                        }
 
                         $new_order->order_from()->associate(Auth::user());
                         $new_order->order_to()->associate(Dealer::find($product['dealer_id']));
@@ -89,32 +93,32 @@ class OrderController extends Controller
                     }
 
                     // bonus distribution
-                    $bonus = [
-                        'product_id' => $product['product_id'],
-                        'bonus_type' => 'instant_sale',
-                        'amount' => $product['quantity'] * $product['price'],
-                        'from_tycoon_id' => auth()->user()->id,
-                        'to_tycoon_id' => auth()->user()->reference_id ? auth()->user()->reference_id : 1,
-                        'placement_id' => auth()->user()->placement_id ? auth()->user()->placement_id : 1
-                    ];
-                    event(new CommissionDistributionEvent($bonus));
+                    // $bonus = [
+                    //     'product_id' => $product['product_id'],
+                    //     'bonus_type' => 'instant_sale',
+                    //     'amount' => $product['quantity'] * $product['price'],
+                    //     'from_tycoon_id' => auth()->user()->id,
+                    //     'to_tycoon_id' => auth()->user()->reference_id ? auth()->user()->reference_id : 1,
+                    //     'placement_id' => auth()->user()->placement_id ? auth()->user()->placement_id : 1
+                    // ];
+                    // event(new CommissionDistributionEvent($bonus));
 
                     // bonus distribution
-                    $bonus = [
-                        'product_id' => $product['product_id'],
-                        'bonus_type' => 'group_bonus',
-                        'amount' => $product['quantity'] * $product['price'],
-                        'to_tycoon_id' => auth()->user()->reference_id ? auth()->user()->reference_id : 1,
-                        'from_tycoon_id' => auth()->user()->id,
-                        'placement_id' => auth()->user()->placement_id ? auth()->user()->placement_id : 1
-                    ];
-                    event(new CommissionDistributionEvent($bonus));
+                    // $bonus = [
+                    //     'product_id' => $product['product_id'],
+                    //     'bonus_type' => 'group_bonus',
+                    //     'amount' => $product['quantity'] * $product['price'],
+                    //     'from_tycoon_id' => auth()->user()->id,
+                    //     'to_tycoon_id' => auth()->user()->reference_id ? auth()->user()->reference_id : 1,
+                    //     'placement_id' => auth()->user()->placement_id ? auth()->user()->placement_id : 1
+                    // ];
+                    // event(new CommissionDistributionEvent($bonus));
                 }
                 TycoonWallet::where('tycoon_id',Auth::user()->id)->update([
                     'product_balance'=> Auth::user()->wallet->product_balance-(float)$req->totalAmount
                 ]);
 
-                DB::commit();
+                // DB::commit();
                 return $this->success($req->all(), 'Order successfully completed.');
             }
             else{
@@ -122,7 +126,7 @@ class OrderController extends Controller
             }
         }
         catch(Exception $e){
-            DB::rollback();
+            // DB::rollback();
             return $this->failed(null, $e->getMessage(), 500);
         }
     }

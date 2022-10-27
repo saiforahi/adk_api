@@ -11,6 +11,7 @@ use App\Models\AdminStock;
 use App\Models\DealerWallet;
 use App\Models\ProductStock;
 use App\Models\ProductStockOrder;
+use App\Models\TycoonProduct;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -122,55 +123,68 @@ class ProductStockController extends Controller
                 'status'=> 'required'
             ]);
             $order=ProductStockOrder::findOrFail($req->order_id);
-            $orderDealer=ProductStockOrder::whereHasMorph('order_from', Dealer::class)->first();
+            $total_sale_amount = ($order->price * $order->qty);
 
-            if ($orderDealer) {
-                $total_sale_amount = ($order->price * $order->qty);
-                switch($req->status){
-                    case 'PROCESSED':
-                        $stock=DealerProductStock::where(['product_id'=> $order->product_id,'dealer_id'=> $order->order_from->id])->first();
-                        if($stock){
-                            $stock->qty += (int)$order->qty;
-                            $stock->save();
-                        }
-                        else{
-                            DealerProductStock::create([
-                                'product_id'=> $order->product_id,
-                                'dealer_id'=> $order->order_from->id,
-                                'fk_order_id'=> $order->order_id,
-                                'qty'=> $order->qty
-                            ]);
-                        }
-                        DealerWallet::updateOrInsert(
-                            ['dealer_id' => $order->order_from->id],
-                            ['stock_balance' => FacadesDB::raw('stock_balance+'. ($order->price * $order->qty))]
-                        );
-                         //bonus distribution
-                        $bonus = [
-                            'product_id' => $order->product_id,
-                            'amount' => $order->qty * $order->price,
-                            'from_dealer_id' => $order->order_from->id,
-                            'to_dealer_id' => $order->order_to->id,
-                            'tycoon_id' => null,
-                        ];
-                        event(new DealerCommissionDistributionEvent($bonus));
-                    break;
+            if ($order) {
+                if($order->order_from_type == "App\Models\Dealer"){
+                    switch($req->status){
+                        case 'PROCESSED':
+                            $stock=DealerProductStock::where(['product_id'=> $order->product_id,'dealer_id'=> $order->order_from->id])->first();
+                            if($stock){
+                                $stock->qty += (int)$order->qty;
+                                $stock->save();
+                            }
+                            else{
+                                DealerProductStock::create([
+                                    'product_id'=> $order->product_id,
+                                    'dealer_id'=> $order->order_from->id,
+                                    'fk_order_id'=> $order->order_id,
+                                    'qty'=> $order->qty
+                                ]);
+                            }
+                            DealerWallet::updateOrInsert(
+                                ['dealer_id' => $order->order_from->id],
+                                ['stock_balance' => FacadesDB::raw('stock_balance+'. ($order->price * $order->qty))]
+                            );
+                            
+                        break;
+                    }
+                }
+                elseif($order->order_from_type == "App\Models\Tycoon"){
+                    $stock=TycoonProduct::where(['product_id'=> $order->product_id,'tycoon_id'=> $order->order_from->id])->first();
+                    if($stock){
+                        $stock->qty += (int)$order->qty;
+                        $stock->save();
+                    }
+                    else{
+                        TycoonProduct::create([
+                            'product_id'=> $order->product_id,
+                            'tycoon_id'=> $order->order_from->id,
+                            'fk_order_id'=> $order->order_id,
+                            'qty'=> $order->qty
+                        ]);
+                    }
                 }
             }
 
             $order->status = $req->status;
             $order->save();
+            //bonus distribution
+            $bonus = [
+                'product_id' => $order->product_id,
+                'amount' => $order->qty * $order->price,
+                'from_dealer_id' => $order->order_from->id,
+                'to_dealer_id' => $order->order_to->id,
+                'tycoon_id' => null,
+            ];
+            event(new DealerCommissionDistributionEvent($bonus));
             // admin order check
-            $dealerOrder=ProductStockOrder::whereHasMorph('order_to', Dealer::class)->first();
-            if ($dealerOrder) {
-                $total_sale_amount = ($order->price * $order->qty);
-                DealerWallet::where('dealer_id', auth()->user()->id)->update(
-                    [
-                        'stock_balance' => FacadesDB::raw('stock_balance-'.$total_sale_amount),
-                        'sales_balance' => FacadesDB::raw('sales_balance+'.$total_sale_amount)
-                    ]
-                );
-            }
+            DealerWallet::where('dealer_id', auth()->user()->id)->update(
+                [
+                    'stock_balance' => FacadesDB::raw('stock_balance-'.$total_sale_amount),
+                    'sales_balance' => FacadesDB::raw('sales_balance+'.$total_sale_amount)
+                ]
+            );
             FacadesDB:: commit();
             return $this->success($order, 'Product Stock order status updated',200);
         }

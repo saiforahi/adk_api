@@ -65,7 +65,7 @@ class CommissionDistributionEventListener
             $masterTycoon->save();
             $data['to_tycoon_id'] = 1;
             $data['type'] = 1;
-            $this->storeBonudHistory($data, $toal_bonus);
+            $this->storeBonusHistory($data, $toal_bonus);
             return true;
         }
         array_push($this->datas, $group_1);
@@ -82,7 +82,7 @@ class CommissionDistributionEventListener
                 $amount = ($toal_bonus * $groupBonus[$key]->bonus_percentage) / 100;
                 $this->updateWallet('group_commission', $amount,  $value->id);
                 $data['to_tycoon_id'] = $value->id;
-                $this->storeBonudHistory($data, $amount);
+                $this->storeBonusHistory($data, $amount);
                 $total_pay += $amount;
             }
         }
@@ -110,7 +110,7 @@ class CommissionDistributionEventListener
     private function instant_sale_distribution($data = [], $percentage = 0) :void {
         $amount = ($data['amount'] * $percentage) / 100;
         $this->updateWallet('sales_commission', $amount, $data['to_tycoon_id']);
-        $this->storeBonudHistory($data, $amount);
+        $this->storeBonusHistory($data, $amount);
     }
 
     /**  commission and wallet balance update here  **/
@@ -123,7 +123,7 @@ class CommissionDistributionEventListener
     }
 
     // store commission history
-    private function storeBonudHistory($data, $amount=0) :void {
+    private function storeBonusHistory($data, $amount=0) :void {
         TycoonCommissionHistory::create([
             'bonus_type' => $data['bonus_type'],
             'product_id' => $data['product_id'],
