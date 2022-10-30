@@ -5,6 +5,8 @@ namespace App\Http\Controllers\v1\dealer;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\WalletTopUpRequest;
 use App\Models\Dealer;
+use App\Models\DealerWallet;
+use App\Models\DealerWithdraw;
 use App\Models\TopupRequest;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder;
@@ -38,6 +40,31 @@ class WalletController extends Controller
                 $query->orderBy('created_at', 'desc');
             })->where('request_from_id',Auth::user()->id)->get();
             return $this->success($requests, 'data', 200);
+        }
+        catch (Exception $e){
+            return $this->failed(null, $e->getMessage(), 500);
+        }
+    }
+
+    public function all_withdraw_request(){
+        try{
+            $requests = DealerWithdraw::where('dealer_id',Auth::user()->id)->get();
+            return $this->success($requests, 'data', 200);
+        }
+        catch (Exception $e){
+            return $this->failed(null, $e->getMessage(), 500);
+        }
+    }
+
+    public function post_withdraw_request(Request $req){
+        try{
+            $req->validate([
+                'amount'=>'required'
+            ]);
+            if($req->amount>DealerWallet::where('dealer_id',auth()->user()->id)->first()->profit){
+                return $this->failed(null, "You can not withdraw more than profit balance", 403);
+            }
+            return $this->success(null, 'data', 200);
         }
         catch (Exception $e){
             return $this->failed(null, $e->getMessage(), 500);

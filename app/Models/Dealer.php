@@ -29,7 +29,7 @@ class Dealer extends Authenticatable implements HasMedia,MustVerifyEmail
     ];
     // returning type
     public function type(){
-        return $this->hasOne(DealerType::class);
+        return $this->hasOne(DealerType::class,'id','dealer_type_id');
     }
     // returning guard name
     public function guard__name(){

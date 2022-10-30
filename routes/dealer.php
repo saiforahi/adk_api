@@ -22,12 +22,10 @@ Route::middleware('auth:dealer')->group(function () {
         Route::get('/stock-orders/{type}', [ProductStockController::class,'product_stock_orders']);
         Route::get('/stock', [DealerController::class,'product_stocks']);
         Route::post('/stock-orders/update-status', [ProductStockController::class,'product_stock_order_status_update']);
-        Route::group(['prefix' => 'courier-app'], function () {
-            
-        });
     });
     Route::group(['prefix' => 'wallet'], function () {
         Route::post('/topup-request', [WalletController::class,'submit_topup_request']);
         Route::get('/topup-request/history', [WalletController::class,'all_topup_request']);
+        Route::get('/withdraw-request/history', [WalletController::class,'all_withdraw_request']);
     });
 });

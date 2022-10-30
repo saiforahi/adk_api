@@ -87,7 +87,7 @@ class DealerController extends Controller
     public function _all():JsonResponse
     {
         try{
-            return $this->success(Dealer::with('wallet:id,dealer_id,product_balance')->get());
+            return $this->success(Dealer::with(['type','wallet'])->get());
         }
         catch(Exception $e){
             return $this->failed(null, $e->getMessage(), 500);
