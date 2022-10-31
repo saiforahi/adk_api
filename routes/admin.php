@@ -27,4 +27,7 @@ Route::middleware(['auth:admin'])->group(function () {
         Route::get('all/{type}', [TopUpRequestController::class, 'all_topup_requests']);
         Route::post('status/update', [TopUpRequestController::class, 'update_status']);
     });
+    Route::group(['prefix' => 'withdraw'], function () {
+        Route::post('dealer/status/update', [WalletController::class, 'update_dealer_withdraw_request_status']);
+    });
 });

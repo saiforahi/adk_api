@@ -64,7 +64,11 @@ class WalletController extends Controller
             if($req->amount>DealerWallet::where('dealer_id',auth()->user()->id)->first()->profit){
                 return $this->failed(null, "You can not withdraw more than profit balance", 403);
             }
-            return $this->success(null, 'data', 200);
+            $new_withdraw_request = DealerWithdraw::create([
+                'dealer_id'=>auth()->user()->id,
+                'amount'=> $req->amount
+            ]);
+            return $this->success(null, $new_withdraw_request, 200);
         }
         catch (Exception $e){
             return $this->failed(null, $e->getMessage(), 500);

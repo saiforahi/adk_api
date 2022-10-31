@@ -27,5 +27,6 @@ Route::middleware('auth:dealer')->group(function () {
         Route::post('/topup-request', [WalletController::class,'submit_topup_request']);
         Route::get('/topup-request/history', [WalletController::class,'all_topup_request']);
         Route::get('/withdraw-request/history', [WalletController::class,'all_withdraw_request']);
+        Route::post('/store-withdraw', [WalletController::class,'post_withdraw_request']);
     });
 });
