@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class TycoonStarMonthlyBonusConfig extends Model
 {
     use HasFactory;
+    
 }

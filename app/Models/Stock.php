@@ -18,5 +18,7 @@ class Stock extends Model
         'stock_out'
     ];
     protected $casts = [
+        'created_at'=>'datetime:Y-m-d h:i:s A',
+        'updated_at'=>'datetime:Y-m-d h:i:s A',
     ];
 }

@@ -19,8 +19,12 @@ class SubSubCategory extends Model implements HasMedia
     protected $casts = [
         'featured' => 'boolean',
         'digital' => 'boolean',
-        'sub_category_id' => 'integer'
+        'sub_category_id' => 'integer',
+        'created_at'=>'datetime:Y-m-d h:i:s A',
+        'updated_at'=>'datetime:Y-m-d h:i:s A',
+        
     ];
+    
 
     /**
      * @return BelongsTo

@@ -3,6 +3,7 @@
 use App\Http\Controllers\v1\admin\BalanceTransferController;
 use App\Http\Controllers\v1\admin\ProductStockOrderController;
 use App\Http\Controllers\v1\admin\TopUpRequestController;
+use App\Http\Controllers\v1\admin\WalletController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,7 @@ Route::middleware(['auth:admin'])->group(function () {
         Route::post('status/update', [TopUpRequestController::class, 'update_status']);
     });
     Route::group(['prefix' => 'withdraw'], function () {
+        Route::get('requests', [WalletController::class, 'all_dealer_withdraw_requests']);
         Route::post('dealer/status/update', [WalletController::class, 'update_dealer_withdraw_request_status']);
     });
 });
