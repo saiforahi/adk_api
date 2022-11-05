@@ -173,9 +173,9 @@ class ProductStockController extends Controller
             $bonus = [
                 'product_id' => $order->product_id,
                 'amount' => $order->qty * $order->price,
-                'from_dealer_id' => $order->order_from->id,
+                'from_dealer_id' => $order->order_from_type == "App\Models\Dealer"?$order->order_from->id:null,
                 'to_dealer_id' => $order->order_to->id,
-                'tycoon_id' => null,
+                'tycoon_id' => $order->order_from_type == "App\Models\Tycoon"?$order->order_from->id:null,
             ];
             event(new DealerCommissionDistributionEvent($bonus));
             // admin order check

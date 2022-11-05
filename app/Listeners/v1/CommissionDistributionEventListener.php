@@ -6,6 +6,7 @@ use App\Events\v1\CommissionDistributionEvent as CommissionDistributionEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use App\Models\{TycoonCommissionHistory, TycoonWallet, TycoonGroupBonusConfig, TycoonBonusConfig, Tycoon, AdminWallet};
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 class CommissionDistributionEventListener
@@ -41,17 +42,41 @@ class CommissionDistributionEventListener
         // $monthly_sallary = $tycoon_bonus->firstWhere('bonus_type', 'monthly_sallary')->bonus_percentage;
        
         $data = $event->data;
-        $amount = 0;
         switch ($data['bonus_type']) {
             case 'instant_sale':
                 $this->instant_sale_distribution($data, $instant_sale);
             break;
             case 'group_bonus':
-                $this->group_bonus_distribution($data, $group_bonus);
+                // $this->group_bonus_distribution($data, $group_bonus);
+                $this->distribute_group_bonus($data,$group_bonus);
             break;
         }
     }
-
+    private function distribute_group_bonus($data,$group_bonus){
+        try{
+            $groupBonus= TycoonGroupBonusConfig::orderBy('group_no', 'asc')->get();
+            $tycoons=$this->get_tycoon_tree_in_array(Tycoon::find(auth()->user()->id));
+            if(count($tycoons)==1 && $tycoons[0]->user_id == $tycoons[0]->id){
+                $masterTycoon = AdminWallet::first();
+                $masterTycoon->tycoon_group_commission_gap = $masterTycoon->tycoon_group_commission_gap + $group_bonus;
+                $masterTycoon->save();
+                $data['to_tycoon_id'] = 1;
+                $data['type'] = 1;
+                $this->storeBonusHistory($data, $group_bonus);
+                return true;
+            }
+            else{
+                for($index=0;$index<count($tycoons);$index++){
+                    $bonus=($data['amount']*$groupBonus[$index]->bonus_percentage)/100;
+                    $this->updateWallet('group_commission',$bonus,$tycoons[$index]->id);
+                    $this->storeBonusHistory($data, $data['amount']);
+                }
+            }
+        }
+        catch(Exception $e){
+            return $e->getMessage();
+        }
+    }
     // group bonus distribution here
     private function group_bonus_distribution($data = [], $percentage = 0) {
         $toal_bonus = ($data['amount'] * $percentage) / 100;
@@ -104,6 +129,22 @@ class CommissionDistributionEventListener
                 $this->tycoon($tycoons, $tyc);
             }
         }
+    }
+    private function get_tycoon_tree_in_array ($tycoon) {
+        $current_tycoon = $tycoon;
+        $tycoons=[];
+        do {
+            $parent_tycoon=Tycoon::where('user_id',$current_tycoon->placement_id)->get()->first();
+            array_push($tycoons,$parent_tycoon);
+            if($parent_tycoon->user_id==1){
+                $current_tycoon=null;
+            }
+            else{
+                $current_tycoon=$parent_tycoon;
+            }
+        } while (count($tycoons)<=20 && $current_tycoon!=null);
+        
+        return $tycoons;
     }
 
     // instant sale distribution here

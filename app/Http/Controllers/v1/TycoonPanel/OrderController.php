@@ -93,26 +93,26 @@ class OrderController extends Controller
                     }
 
                     // bonus distribution
-                    // $bonus = [
-                    //     'product_id' => $product['product_id'],
-                    //     'bonus_type' => 'instant_sale',
-                    //     'amount' => $product['quantity'] * $product['price'],
-                    //     'from_tycoon_id' => auth()->user()->id,
-                    //     'to_tycoon_id' => auth()->user()->reference_id ? auth()->user()->reference_id : 1,
-                    //     'placement_id' => auth()->user()->placement_id ? auth()->user()->placement_id : 1
-                    // ];
-                    // event(new CommissionDistributionEvent($bonus));
+                    $bonus = [
+                        'product_id' => $product['product_id'],
+                        'bonus_type' => 'instant_sale',
+                        'amount' => $product['quantity'] * $product['price'],
+                        'from_tycoon_id' => auth()->user()->id,
+                        'to_tycoon_id' => auth()->user()->reference_id ? auth()->user()->reference_id : 1,
+                        'placement_id' => auth()->user()->placement_id ? auth()->user()->placement_id : 1
+                    ];
+                    event(new CommissionDistributionEvent($bonus));
 
                     // bonus distribution
-                    // $bonus = [
-                    //     'product_id' => $product['product_id'],
-                    //     'bonus_type' => 'group_bonus',
-                    //     'amount' => $product['quantity'] * $product['price'],
-                    //     'from_tycoon_id' => auth()->user()->id,
-                    //     'to_tycoon_id' => auth()->user()->reference_id ? auth()->user()->reference_id : 1,
-                    //     'placement_id' => auth()->user()->placement_id ? auth()->user()->placement_id : 1
-                    // ];
-                    // event(new CommissionDistributionEvent($bonus));
+                    $bonus = [
+                        'product_id' => $product['product_id'],
+                        'bonus_type' => 'group_bonus',
+                        'amount' => $product['quantity'] * $product['price'],
+                        'from_tycoon_id' => auth()->user()->id,
+                        'to_tycoon_id' => auth()->user()->reference_id ? auth()->user()->reference_id : 1,
+                        'placement_id' => auth()->user()->placement_id ? auth()->user()->placement_id : 1
+                    ];
+                    event(new CommissionDistributionEvent($bonus));
                 }
                 TycoonWallet::where('tycoon_id',Auth::user()->id)->update([
                     'product_balance'=> Auth::user()->wallet->product_balance-(float)$req->totalAmount
